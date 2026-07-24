@@ -123,7 +123,8 @@ def load_user_comments(
         raise ValueError("Messages or users table not identified")
 
     conn = sqlite3.connect(
-        f"file:{quote(str(Path(db_path).resolve()))}?mode=ro", uri=True
+        f"file:{quote(str(Path(db_path).resolve()))}?mode=ro&immutable=1",
+        uri=True,
     )
     try:
         query = f"""

@@ -104,7 +104,8 @@ class Anonymizer:
             raise ValueError("Cannot build mapping: users table not identified")
 
         conn = sqlite3.connect(
-            f"file:{quote(str(Path(db_path).resolve()))}?mode=ro", uri=True
+            f"file:{quote(str(Path(db_path).resolve()))}?mode=ro&immutable=1",
+            uri=True,
         )
         try:
             cur = conn.execute(

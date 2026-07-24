@@ -192,9 +192,13 @@ def explore_database(db_path: str | Path) -> DBStructure:
 
     structure = DBStructure(path=str(path))
 
-    # Read-only: source DB may live on a read-only mount (e.g. Kaggle input),
-    # where sqlite3's default rwc open mode fails with "unable to open database file"
-    conn = sqlite3.connect(f"file:{quote(str(path.resolve()))}?mode=ro", uri=True)
+    # Read-only + immutable: source DB may live on a read-only/overlay mount
+    # (e.g. Kaggle input) that doesn't support POSIX file locking — even
+    # mode=ro still takes a shared lock unless immutable=1 tells SQLite the
+    # file will never change, which is exactly what this source DB guarantees.
+    conn = sqlite3.connect(
+        f"file:{quote(str(path.resolve()))}?mode=ro&immutable=1", uri=True
+    )
     try:
         cur = conn.execute(
             "SELECT name, type FROM sqlite_master "
