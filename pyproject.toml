@@ -18,5 +18,8 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
 
+[project.scripts]
+political-analysis = "political_analysis.pipeline:main"
+
 [tool.setuptools.packages.find]
 include = ["political_analysis*"]

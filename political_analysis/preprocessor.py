@@ -186,10 +186,6 @@ def load_user_comments(
             skipped_short += 1
             continue
 
-        if len(comments) < min_comments:
-            skipped_short += 1
-            continue
-
         # Classify quotes and extract own text
         for c in comments:
             if _is_quote(c.text):
@@ -200,6 +196,11 @@ def load_user_comments(
         political_comments = [c for c in comments if _is_political(c.text)]
         if len(political_comments) == 0:
             skipped_political += 1
+            continue
+
+        # Check min_comments AFTER political filter
+        if len(political_comments) < min_comments:
+            skipped_short += 1
             continue
 
         anon_id = anonymizer.anonymize(real_id)

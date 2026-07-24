@@ -34,7 +34,15 @@ pip install transformers accelerate bitsandbytes torch pydantic
 ### Локально
 
 ```bash
+# Через модуль
 python -m political_analysis.pipeline --database app.db --output-dir ./results
+
+# После установки
+pip install -e .
+political-analysis --database app.db --output-dir ./results
+
+# Список аргументов
+python -m political_analysis.pipeline --help
 ```
 
 ## Конфигурация

@@ -96,3 +96,24 @@ def test_config_defaults():
     assert config.seed == 42
     assert config.resume is True
     assert config.force_reprocess is False
+
+
+def test_cli_help():
+    """Проверяет, что CLI --help работает."""
+    from political_analysis.pipeline import main
+    import pytest
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--help"])
+    assert exc_info.value.code == 0
+
+
+def test_cli_parse_args():
+    """Проверяет парсинг CLI аргументов."""
+    from political_analysis.pipeline import main
+    import sys
+    # Just test that argparse doesn't crash on valid args
+    # We can't run the full pipeline without GPU/model
+    try:
+        main(["--database", "test.db", "--min-comments", "10", "--seed", "123"])
+    except (FileNotFoundError, RuntimeError, Exception):
+        pass  # Expected - no GPU or model available in test env

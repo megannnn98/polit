@@ -267,6 +267,53 @@ def merge_block_results(block_results: list[dict]) -> dict:
                     existing.add(pair)
     merged["evidence"] = all_evidence
 
+    # Merge ideological_similarity (weighted average of numeric fields)
+    if merged.get("content_analysis", {}).get("ideological_similarity"):
+        ideol_keys = list(merged["content_analysis"]["ideological_similarity"].keys())
+        for key in ideol_keys:
+            values = []
+            weights = []
+            for r in block_results:
+                val = r.get("content_analysis", {}).get("ideological_similarity", {}).get(key)
+                if val is not None:
+                    w = r.get("analyzed_comments", 1)
+                    values.append(val)
+                    weights.append(w)
+            if values:
+                merged["content_analysis"]["ideological_similarity"][key] = round(
+                    sum(v * w for v, w in zip(values, weights)) / sum(weights)
+                )
+
+    # Merge protest_rhetoric (weighted average)
+    if merged.get("content_analysis", {}).get("protest_rhetoric"):
+        for key in ["score", "confidence"]:
+            values = []
+            weights = []
+            for r in block_results:
+                val = r.get("content_analysis", {}).get("protest_rhetoric", {}).get(key)
+                if val is not None:
+                    w = r.get("analyzed_comments", 1)
+                    values.append(val)
+                    weights.append(w)
+            if values:
+                merged["content_analysis"]["protest_rhetoric"][key] = round(
+                    sum(v * w for v, w in zip(values, weights)) / sum(weights)
+                ) if key == "confidence" else round(
+                    sum(v * w for v, w in zip(values, weights)) / sum(weights)
+                )
+
+    # Merge axes confidence (average)
+    for axis in ["economic", "authority", "science"]:
+        confs = []
+        for r in block_results:
+            c = r.get("content_analysis", {}).get("axes", {}).get(axis, {}).get("confidence")
+            if c is not None:
+                confs.append(c)
+        if confs and merged.get("content_analysis", {}).get("axes", {}).get(axis):
+            merged["content_analysis"]["axes"][axis]["confidence"] = round(
+                sum(confs) / len(confs), 2
+            )
+
     # Merge contradictions and unknown_topics
     all_contradictions = []
     all_unknown = []
@@ -283,5 +330,10 @@ def merge_block_results(block_results: list[dict]) -> dict:
         if r.get("overall_confidence") is not None
     ]
     merged["overall_confidence"] = round(sum(confs) / len(confs), 2) if confs else 0.0
+
+    # insufficient_data: True if ANY block has insufficient data
+    merged["insufficient_data"] = any(
+        r.get("insufficient_data", False) for r in block_results
+    )
 
     return merged

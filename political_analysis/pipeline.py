@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -141,9 +142,9 @@ class Pipeline:
         for i, uc in enumerate(user_comments):
             anon_id = uc.anonymous_id
 
-            # Check resume
+            # Check resume — look for user in ANY previous run
             if self.config.resume and not self.config.force_reprocess:
-                if self.storage.is_user_processed(anon_id, self.run_id):
+                if self.storage.is_user_processed_in_any_run(anon_id):
                     logger.info(
                         "[%d/%d] Skipping %s (already processed)",
                         i + 1,
@@ -354,3 +355,89 @@ class Pipeline:
             self.state.total_users,
             elapsed,
         )
+
+
+def main(argv: list[str] | None = None) -> None:
+    """CLI entrypoint для запуска пайплайна."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Anonymous political content analysis pipeline"
+    )
+    parser.add_argument(
+        "--database", default="app.db",
+        help="Path to SQLite database (default: app.db)"
+    )
+    parser.add_argument(
+        "--model-id", default="Qwen/Qwen3-4B-Instruct-2507",
+        help="HuggingFace model ID"
+    )
+    parser.add_argument(
+        "--min-comments", type=int, default=20,
+        help="Minimum comments per user (default: 20)"
+    )
+    parser.add_argument(
+        "--min-comment-length", type=int, default=20,
+        help="Minimum comment length in chars (default: 20)"
+    )
+    parser.add_argument(
+        "--max-comments-per-user", type=int, default=300,
+        help="Max comments per user (default: 300)"
+    )
+    parser.add_argument(
+        "--max-input-tokens", type=int, default=24000,
+        help="Max input tokens (default: 24000)"
+    )
+    parser.add_argument(
+        "--max-new-tokens", type=int, default=1500,
+        help="Max new tokens for generation (default: 1500)"
+    )
+    parser.add_argument(
+        "--seed", type=int, default=42,
+        help="Random seed (default: 42)"
+    )
+    parser.add_argument(
+        "--output-dir", default=".",
+        help="Output directory (default: current dir)"
+    )
+    parser.add_argument(
+        "--no-resume", action="store_true",
+        help="Disable resume (reprocess all users)"
+    )
+    parser.add_argument(
+        "--force-reprocess", action="store_true",
+        help="Force reprocessing already completed users"
+    )
+    parser.add_argument(
+        "--log-level", default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging level (default: INFO)"
+    )
+    args = parser.parse_args(argv)
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
+    config = PipelineConfig(
+        database_path=args.database,
+        model_id=args.model_id,
+        min_comments=args.min_comments,
+        min_comment_length=args.min_comment_length,
+        max_comments_per_user=args.max_comments_per_user,
+        max_input_tokens=args.max_input_tokens,
+        max_new_tokens=args.max_new_tokens,
+        seed=args.seed,
+        output_dir=args.output_dir,
+        resume=not args.no_resume,
+        force_reprocess=args.force_reprocess,
+    )
+
+    pipeline = Pipeline(config)
+    state = pipeline.run()
+    sys.exit(0 if state.error_users == 0 else 1)
+
+
+if __name__ == "__main__":
+    main()

@@ -87,6 +87,7 @@ class Storage:
             CREATE TABLE IF NOT EXISTS evidence (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 anon_id TEXT NOT NULL,
+                run_id TEXT,
                 category TEXT NOT NULL,
                 comment_id INTEGER,
                 quote TEXT,
@@ -217,9 +218,9 @@ class Storage:
         for category, items in evidence.items():
             for item in items:
                 conn.execute(
-                    """INSERT INTO evidence (anon_id, category, comment_id, quote)
-                       VALUES (?, ?, ?, ?)""",
-                    (anon_id, category, item.get("comment_id"), item.get("quote", "")),
+                    """INSERT INTO evidence (anon_id, run_id, category, comment_id, quote)
+                       VALUES (?, ?, ?, ?, ?)""",
+                    (anon_id, run_id, category, item.get("comment_id"), item.get("quote", "")),
                 )
 
         conn.commit()
@@ -285,6 +286,24 @@ class Storage:
             (anon_id, run_id),
         )
         return cur.fetchone() is not None
+
+    def is_user_processed_in_any_run(self, anon_id: str) -> bool:
+        """Проверяет, был ли пользователь обработан в любом предыдущем прогона."""
+        conn = self._get_conn()
+        cur = conn.execute(
+            "SELECT 1 FROM anonymous_users WHERE anon_id = ?",
+            (anon_id,),
+        )
+        return cur.fetchone() is not None
+
+    def get_last_run_id(self) -> str | None:
+        """Возвращает run_id последнего прогона."""
+        conn = self._get_conn()
+        cur = conn.execute(
+            "SELECT run_id FROM analysis_runs ORDER BY started_at DESC LIMIT 1"
+        )
+        row = cur.fetchone()
+        return row[0] if row else None
 
     def save_config(self, config: dict) -> None:
         """Сохраняет конфигурацию прогона."""
