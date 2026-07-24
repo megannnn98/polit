@@ -3,7 +3,9 @@
 import pytest
 
 from political_analysis.analyzer import (
+    _BalancedJsonStoppingCriteria,
     _extract_json,
+    _json_object_end,
     split_into_blocks,
     merge_block_results,
 )
@@ -30,6 +32,20 @@ def test_extract_json_with_surrounding_text():
     assert result == {"left": 50, "right": 50}
 
 
+def test_extract_json_ignores_braces_inside_strings():
+    """Проверяет, что фигурные скобки в строках не ломают поиск JSON."""
+    text = 'prefix {"quote": "текст с {примером}", "score": 50} suffix'
+    result = _extract_json(text)
+    assert result == {"quote": "текст с {примером}", "score": 50}
+
+
+def test_extract_json_skips_invalid_object_before_valid_json():
+    """Проверяет, что невалидный объект перед JSON не блокирует парсинг."""
+    text = "prefix {broken} middle {\"score\": 50}"
+    result = _extract_json(text)
+    assert result == {"score": 50}
+
+
 def test_extract_json_invalid():
     """Проверяет обработку невалидного JSON."""
     text = "This is not JSON at all"
@@ -39,11 +55,39 @@ def test_extract_json_invalid():
 
 def test_split_into_blocks():
     """Проверяет разбиение на блоки."""
-    items = list(range(10))
+    items = [{"text": str(i)} for i in range(10)]
     blocks = split_into_blocks(items, max_comments_per_block=3)
     assert len(blocks) == 4
-    assert blocks[0] == [0, 1, 2]
-    assert blocks[-1] == [9]
+    assert blocks[0] == [{"text": "0"}, {"text": "1"}, {"text": "2"}]
+    assert blocks[-1] == [{"text": "9"}]
+
+
+def test_split_into_blocks_respects_char_limit():
+    """Проверяет разбиение по суммарной длине текста."""
+    items = [{"text": "aaaa"}, {"text": "bbbb"}, {"text": "cccc"}]
+    blocks = split_into_blocks(
+        items,
+        max_comments_per_block=10,
+        max_chars_per_block=8,
+    )
+    assert blocks == [[items[0], items[1]], [items[2]]]
+
+
+def test_json_object_end_waits_for_complete_json():
+    """Проверяет детекцию завершённого верхнеуровневого JSON."""
+    assert _json_object_end('{"a": {"b": 1}} trailing') == len('{"a": {"b": 1}}')
+    assert _json_object_end('{"a": 1') is None
+
+
+def test_balanced_json_stopping_criteria():
+    """Проверяет остановку после валидного JSON-ответа."""
+    class FakeTokenizer:
+        def decode(self, generated_ids, skip_special_tokens=True):
+            del generated_ids, skip_special_tokens
+            return '{"a": 1}'
+
+    stopper = _BalancedJsonStoppingCriteria(FakeTokenizer(), prompt_token_count=2)
+    assert stopper([[100, 101, 1, 2, 3]], None) is True
 
 
 def test_merge_block_results_deduplicates_evidence():

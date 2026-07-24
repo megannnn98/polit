@@ -36,11 +36,11 @@ SYSTEM_PROMPT = """Вы — аналитик политических текст
 ОБЯЗАТЕЛЬНЫЕ ПОЛЯ:
 - confidence (0.0-1.0)
 - insufficient_data (boolean)
-- evidence (подтверждающие цитаты)
-- contradictions (противоречия)
-- unknown_topics (недостаточно данных темы)
+- evidence: не больше 1 короткой цитаты на категорию, quote <= 120 символов
+- contradictions: не больше 3 коротких записей
+- unknown_topics: не больше 5 коротких тем
 
-Отвечайте ТОЛЬКО валидным JSON без markdown-обёрток."""
+Отвечайте ТОЛЬКО компактным валидным JSON без markdown-обёрток и пояснений."""
 
 
 def _build_analysis_prompt(comments: list[dict]) -> str:
@@ -100,7 +100,7 @@ def run_inference(
     model,
     tokenizer,
     comments: list[dict],
-    max_new_tokens: int = 1500,
+    max_new_tokens: int = 900,
     temperature: float = 0.0,
     do_sample: bool = False,
     seed: int = 42,
@@ -120,6 +120,7 @@ def run_inference(
         AnalysisResult с сырым ответом и распарсенным JSON
     """
     import torch
+    from transformers import StoppingCriteriaList
 
     torch.manual_seed(seed)
     if torch.cuda.is_available():
@@ -136,15 +137,27 @@ def run_inference(
     )
     inputs = tokenizer(text, return_tensors="pt").to(model.device)
 
+    if hasattr(model, "generation_config") and not do_sample:
+        model.generation_config.temperature = 1.0
+        model.generation_config.top_p = 1.0
+        model.generation_config.top_k = 50
+
+    generate_kwargs = {
+        **inputs,
+        "max_new_tokens": max_new_tokens,
+        "do_sample": do_sample,
+        "pad_token_id": tokenizer.pad_token_id,
+        "eos_token_id": tokenizer.eos_token_id,
+        "stopping_criteria": StoppingCriteriaList([
+            _BalancedJsonStoppingCriteria(tokenizer, inputs["input_ids"].shape[1])
+        ]),
+    }
+    if do_sample:
+        generate_kwargs["temperature"] = temperature
+        generate_kwargs["top_p"] = 1.0
+
     with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            do_sample=do_sample,
-            top_p=1.0,
-            pad_token_id=tokenizer.pad_token_id,
-        )
+        outputs = model.generate(**generate_kwargs)
 
     # Decode only new tokens
     new_tokens = outputs[0][inputs["input_ids"].shape[1]:]
@@ -193,30 +206,91 @@ def _extract_json(text: str) -> dict | None:
     except json.JSONDecodeError:
         pass
 
-    # Try to find JSON object
-    depth = 0
-    start = -1
-    for i, ch in enumerate(text):
-        if ch == "{":
-            if depth == 0:
-                start = i
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0 and start >= 0:
-                try:
-                    return json.loads(text[start : i + 1])
-                except json.JSONDecodeError:
-                    start = -1
+    parsed = _find_first_valid_json_object(text)
+    if parsed is not None:
+        return parsed
 
     logger.debug("Failed to extract JSON from: %.200s...", text)
     return None
 
 
+def _find_first_valid_json_object(text: str) -> dict | None:
+    """Находит первый валидный JSON-объект в тексте."""
+    search_from = 0
+    while True:
+        start = text.find("{", search_from)
+        if start < 0:
+            return None
+
+        object_end = _json_object_end(text[start:])
+        if object_end is None:
+            return None
+
+        try:
+            return json.loads(text[start : start + object_end])
+        except json.JSONDecodeError:
+            search_from = start + 1
+
+
+def _json_object_end(text: str) -> int | None:
+    """Возвращает индекс после завершённого верхнеуровневого JSON-объекта."""
+    depth = 0
+    start = -1
+    in_string = False
+    escaped = False
+
+    for i, ch in enumerate(text):
+        if start < 0:
+            if ch == "{":
+                start = i
+                depth = 1
+            continue
+
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+
+    return None
+
+
+class _BalancedJsonStoppingCriteria:
+    """Останавливает generation, как только модель закрыла валидный JSON."""
+
+    def __init__(self, tokenizer, prompt_token_count: int):
+        self._tokenizer = tokenizer
+        self._prompt_token_count = prompt_token_count
+
+    def __call__(self, input_ids, scores, **kwargs) -> bool:
+        del scores, kwargs
+
+        generated_ids = input_ids[0][self._prompt_token_count:]
+        if len(generated_ids) == 0:
+            return False
+        if hasattr(generated_ids, "tolist"):
+            generated_ids = generated_ids.tolist()
+
+        text = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
+        return _find_first_valid_json_object(text) is not None
+
+
 def split_into_blocks(
     comments: list[dict],
-    max_comments_per_block: int = 50,
-    max_chars_per_block: int = 16000,
+    max_comments_per_block: int = 20,
+    max_chars_per_block: int = 8000,
 ) -> list[list[dict]]:
     """Разбивает комментарии на блоки для обработки.
 

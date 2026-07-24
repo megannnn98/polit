@@ -30,18 +30,19 @@ class PipelineConfig:
     model_id: str = "Qwen/Qwen3-4B-Instruct-2507"
     min_comments: int = 20
     min_comment_length: int = 20
+    max_users: int | None = None
     max_comments_per_user: int = 300
     batch_size: int = 1
     max_input_tokens: int = 24000
-    max_new_tokens: int = 1500
+    max_new_tokens: int = 900
     seed: int = 42
     resume: bool = True
     force_reprocess: bool = False
     output_dir: str = "."
     device: str = "auto"
     max_retries: int = 1
-    max_comments_per_block: int = 50
-    max_chars_per_block: int = 16000
+    max_comments_per_block: int = 20
+    max_chars_per_block: int = 8000
     stability_runs: int = 1
     stability_threshold: float = 15.0
 
@@ -51,6 +52,7 @@ class PipelineConfig:
             "model_id": self.model_id,
             "min_comments": self.min_comments,
             "min_comment_length": self.min_comment_length,
+            "max_users": self.max_users,
             "max_comments_per_user": self.max_comments_per_user,
             "batch_size": self.batch_size,
             "max_input_tokens": self.max_input_tokens,
@@ -123,6 +125,12 @@ class Pipeline:
             min_comments=self.config.min_comments,
             min_comment_length=self.config.min_comment_length,
         )
+        user_comments.sort(
+            key=lambda uc: (uc.political_comments, uc.unique_comments),
+            reverse=True,
+        )
+        if self.config.max_users is not None:
+            user_comments = user_comments[:self.config.max_users]
         self.state.total_users = len(user_comments)
         logger.info("Found %d users with sufficient comments", self.state.total_users)
 
@@ -393,6 +401,10 @@ def main(argv: list[str] | None = None) -> None:
         help="Minimum comment length in chars (default: 20)"
     )
     parser.add_argument(
+        "--max-users", type=int, default=None,
+        help="Limit run to the N most active users (default: all)"
+    )
+    parser.add_argument(
         "--max-comments-per-user", type=int, default=300,
         help="Max comments per user (default: 300)"
     )
@@ -401,8 +413,8 @@ def main(argv: list[str] | None = None) -> None:
         help="Max input tokens (default: 24000)"
     )
     parser.add_argument(
-        "--max-new-tokens", type=int, default=1500,
-        help="Max new tokens for generation (default: 1500)"
+        "--max-new-tokens", type=int, default=900,
+        help="Max new tokens for generation (default: 900)"
     )
     parser.add_argument(
         "--seed", type=int, default=42,
@@ -441,6 +453,7 @@ def main(argv: list[str] | None = None) -> None:
         model_id=args.model_id,
         min_comments=args.min_comments,
         min_comment_length=args.min_comment_length,
+        max_users=args.max_users,
         max_comments_per_user=args.max_comments_per_user,
         max_input_tokens=args.max_input_tokens,
         max_new_tokens=args.max_new_tokens,

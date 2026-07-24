@@ -92,7 +92,11 @@ def test_config_defaults():
     config = PipelineConfig()
     assert config.min_comments == 20
     assert config.min_comment_length == 20
+    assert config.max_users is None
     assert config.max_comments_per_user == 300
+    assert config.max_new_tokens == 900
+    assert config.max_comments_per_block == 20
+    assert config.max_chars_per_block == 8000
     assert config.seed == 42
     assert config.resume is True
     assert config.force_reprocess is False

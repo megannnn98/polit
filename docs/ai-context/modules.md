@@ -81,7 +81,7 @@
 **Ключевые функции:**
 - `run_inference(model, tokenizer, comments, max_new_tokens, seed) → AnalysisResult`
 - `_extract_json(text) → dict|None` — 3 стратегии: прямой парсинг, очистка markdown, поиск по скобкам
-- `split_into_blocks(comments, max_comments_per_block=50) → list[list]`
+- `split_into_blocks(comments, max_comments_per_block=20, max_chars_per_block=8000) → list[list]`
 - `merge_block_results(block_results) → dict` — взвешенное усреднение + дедупликация evidence
 
 **Исправлено по ревью:**
@@ -155,5 +155,6 @@
 - При ошибке валидации: correction prompt → повторный инференс
 - Все попытки исчерпаны → `save_error`
 
-**Поля конфига:** min_comments=20, max_comments_per_user=300, max_input_tokens=24000,
-  max_new_tokens=1500, seed=42, resume=True, max_retries=1, max_comments_per_block=50
+**Поля конфига:** min_comments=20, max_users=None, max_comments_per_user=300,
+  max_input_tokens=24000, max_new_tokens=900, seed=42, resume=True,
+  max_retries=1, max_comments_per_block=20
