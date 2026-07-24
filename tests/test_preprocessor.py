@@ -13,6 +13,7 @@ from political_analysis.preprocessor import (
     CommentRecord,
     UserComments,
     limit_comments,
+    load_user_comments,
 )
 from political_analysis.anonymizer import Anonymizer
 from political_analysis.db_explorer import explore_database
@@ -134,7 +135,7 @@ def sample_db():
     for i in range(5):
         conn.execute(
             "INSERT INTO messages (user, channel, text, date) VALUES (?, ?, ?, ?)",
-            (1, "test_channel", f"Обычный текст без политики номер {i}", f"2025-02-{i+1:02d}"),
+            (1, "test_channel", f"Обычный текст о погоде номер {i}", f"2025-02-{i+1:02d}"),
         )
     # Add user 2 with few messages
     conn.execute("INSERT INTO users VALUES (2, 'bob')")
@@ -153,10 +154,12 @@ def test_load_user_comments_filters(sample_db):
     """Проверяет фильтрацию по минимальному числу комментариев."""
     structure = explore_database(sample_db)
     anon = Anonymizer()
-    results = anon.build_from_database(sample_db, structure)
+    anon.build_from_database(sample_db, structure)
+    results = load_user_comments(sample_db, structure, anon, min_comments=20)
     # User 1 has 25 political messages, user 2 has 5 non-political
-    # Only user 1 should pass the filter (min_comments=5 for this test)
-    # But with default min_comments=20, only user 1 passes
+    # Only user 1 should pass (min_comments=20)
+    assert len(results) == 1
+    assert results[0].political_comments == 25
 
 
 def test_load_user_comments_deduplication():

@@ -296,10 +296,9 @@ def merge_block_results(block_results: list[dict]) -> dict:
                     values.append(val)
                     weights.append(w)
             if values:
-                merged["content_analysis"]["protest_rhetoric"][key] = round(
-                    sum(v * w for v, w in zip(values, weights)) / sum(weights)
-                ) if key == "confidence" else round(
-                    sum(v * w for v, w in zip(values, weights)) / sum(weights)
+                weighted = sum(v * w for v, w in zip(values, weights)) / sum(weights)
+                merged["content_analysis"]["protest_rhetoric"][key] = (
+                    round(weighted, 2) if key == "confidence" else round(weighted)
                 )
 
     # Merge axes confidence (average)

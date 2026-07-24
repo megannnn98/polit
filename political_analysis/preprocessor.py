@@ -51,7 +51,7 @@ class UserComments:
     """Коллекция комментариев одного пользователя."""
     anonymous_id: str
     real_id: int
-    username: str | None
+    username: str | None = None
     total_comments: int = 0
     unique_comments: int = 0
     political_comments: int = 0

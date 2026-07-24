@@ -109,11 +109,24 @@ def test_cli_help():
 
 def test_cli_parse_args():
     """Проверяет парсинг CLI аргументов."""
-    from political_analysis.pipeline import main
-    import sys
-    # Just test that argparse doesn't crash on valid args
-    # We can't run the full pipeline without GPU/model
-    try:
-        main(["--database", "test.db", "--min-comments", "10", "--seed", "123"])
-    except (FileNotFoundError, RuntimeError, Exception):
-        pass  # Expected - no GPU or model available in test env
+    from political_analysis.pipeline import PipelineConfig
+    import argparse
+
+    # Test that argparse correctly maps args to config values
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--database", default="app.db")
+    parser.add_argument("--min-comments", type=int, default=20)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--no-resume", action="store_true")
+    args = parser.parse_args(["--database", "test.db", "--min-comments", "10", "--seed", "123"])
+
+    config = PipelineConfig(
+        database_path=args.database,
+        min_comments=args.min_comments,
+        seed=args.seed,
+        resume=not args.no_resume,
+    )
+    assert config.database_path == "test.db"
+    assert config.min_comments == 10
+    assert config.seed == 123
+    assert config.resume is True

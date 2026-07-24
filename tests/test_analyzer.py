@@ -126,6 +126,7 @@ def test_merge_block_results_ideological_similarity():
     assert ideol["anarchism"] == 47
     protest = merged["content_analysis"]["protest_rhetoric"]
     assert protest["score"] == 57  # (30*10 + 70*20) / 30
+    assert protest["confidence"] == round((0.6 * 10 + 0.9 * 20) / 30, 2)  # 0.8
 
 
 def test_merge_block_results_insufficient_data():
