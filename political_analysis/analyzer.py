@@ -149,6 +149,16 @@ def run_inference(
     new_tokens = outputs[0][inputs["input_ids"].shape[1]:]
     raw_response = tokenizer.decode(new_tokens, skip_special_tokens=True)
 
+    # Free the generated sequence + KV cache before the next call in the
+    # block/user loop — otherwise GPU memory from `outputs` (input + up to
+    # max_new_tokens of generated ids, plus the cache built during decoding)
+    # isn't guaranteed to be released before the next generate() call, and
+    # repeated calls in a loop run the GPU out of memory (observed on Kaggle
+    # T4: OOM on the 2nd block despite each block being well within budget).
+    del outputs, inputs, new_tokens
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
     result = AnalysisResult(raw_response=raw_response)
     result.parsed_json = _extract_json(raw_response)
     if result.parsed_json is not None:
