@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import json
 import logging
 import re
@@ -150,13 +151,15 @@ def run_inference(
     raw_response = tokenizer.decode(new_tokens, skip_special_tokens=True)
 
     # Free the generated sequence + KV cache before the next call in the
-    # block/user loop — otherwise GPU memory from `outputs` (input + up to
-    # max_new_tokens of generated ids, plus the cache built during decoding)
-    # isn't guaranteed to be released before the next generate() call, and
-    # repeated calls in a loop run the GPU out of memory (observed on Kaggle
-    # T4: OOM on the 2nd block despite each block being well within budget).
+    # block/user loop. del alone wasn't enough (observed on Kaggle T4: OOM
+    # on the 2nd block, "reserved but unallocated" near zero — the memory
+    # was genuinely still referenced, not just cached by the allocator).
+    # generate()'s output/cache objects can hold reference cycles that
+    # refcounting alone won't collect; gc.collect() breaks those before
+    # empty_cache() can actually return the memory to the driver.
     del outputs, inputs, new_tokens
     if torch.cuda.is_available():
+        gc.collect()
         torch.cuda.empty_cache()
 
     result = AnalysisResult(raw_response=raw_response)
