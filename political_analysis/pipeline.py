@@ -131,6 +131,10 @@ class Pipeline:
         )
         if self.config.max_users is not None:
             user_comments = user_comments[:self.config.max_users]
+            logger.info(
+                "Selected top %d most active users for this run",
+                self.config.max_users,
+            )
         self.state.total_users = len(user_comments)
         logger.info("Found %d users with sufficient comments", self.state.total_users)
 
