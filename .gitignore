@@ -1,0 +1,12 @@
+/political_analysis/__pycache__
+/tests/__pycache__
+/__pycache__
+*.pyc
+app.db
+analysis.db
+results.jsonl
+errors.jsonl
+run_config.json
+summary.csv
+anonymization_mapping.json
+.pytest_cache

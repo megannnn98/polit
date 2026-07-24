@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "political-analysis"
+version = "1.0.0"
+description = "Анонимный анализ политического содержания комментариев"
+requires-python = ">=3.10"
+dependencies = [
+    "transformers>=4.40",
+    "accelerate>=0.30",
+    "bitsandbytes>=0.43",
+    "torch>=2.1",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+include = ["political_analysis*"]
