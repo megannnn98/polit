@@ -5,19 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Political Analysis Results</title>
   <style>
-    :root { color-scheme: light; --bg: #f6f7f9; --panel: #ffffff; --text: #1f2933; --muted: #667085; --line: #d9dee7; --blue: #2563eb; --green: #15803d; --red: #b42318; }
+    :root { color-scheme: light; --bg: #f6f7f9; --panel: #ffffff; --text: #1f2933; --muted: #667085; --line: #d9dee7; --blue: #2563eb; --green: #15803d; --red: #b42318; --amber: #b45309; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     main { width: min(1180px, calc(100% - 32px)); margin: 28px auto 56px; }
     h1, h2, h3, p { margin-top: 0; }
     h1 { margin-bottom: 8px; font-size: 28px; letter-spacing: 0; }
     h2 { margin-bottom: 14px; font-size: 20px; }
-    pre { overflow-x: auto; margin: 10px 0 0; padding: 12px; border-radius: 6px; background: #fff7ed; color: #7c2d12; white-space: pre-wrap; }
     .muted { color: var(--muted); }
     .topbar { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
     .badge { display: inline-flex; align-items: center; min-height: 30px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--muted); font-size: 13px; white-space: nowrap; }
     .tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
-    .tab-button { min-width: 210px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); text-align: left; cursor: pointer; }
+    .tab-button { min-width: 220px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); text-align: left; cursor: pointer; }
     .tab-button.active { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
     .tab-button span { display: block; font-weight: 700; }
     .tab-button small { color: var(--muted); }
@@ -31,8 +30,6 @@
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
     .section { margin-bottom: 18px; padding: 18px; }
     .warning { border-color: #fed7aa; background: #fffaf3; }
-    .draft { margin: 12px 0; padding: 12px; border: 1px solid #fed7aa; border-radius: 8px; background: #fff; }
-    .draft h3 { margin-bottom: 8px; font-size: 16px; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
     th { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; }
@@ -41,14 +38,12 @@
     .score-head { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; }
     .bar { height: 12px; overflow: hidden; border-radius: 999px; background: #edf0f5; }
     .bar span { display: block; height: 100%; border-radius: inherit; background: var(--blue); }
-    .bar.green span { background: var(--green); }
-    .bar.red span { background: var(--red); }
     .comments { display: grid; gap: 10px; }
     .comment { padding: 14px 16px; }
     .comment-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 8px; color: var(--muted); font-size: 13px; }
     .comment-text { margin: 0; white-space: pre-wrap; }
     @media (max-width: 980px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid { grid-template-columns: 1fr; } }
-    @media (max-width: 620px) { main { width: min(100% - 20px, 1180px); } .topbar { display: block; } .badge { margin-top: 12px; } .summary { grid-template-columns: 1fr; } .tab-button { min-width: 180px; } }
+    @media (max-width: 620px) { main { width: min(100% - 20px, 1180px); } .topbar { display: block; } .badge { margin-top: 12px; } .summary { grid-template-columns: 1fr; } .tab-button { min-width: 190px; } }
   </style>
 </head>
 <body>
@@ -56,31 +51,204 @@
     <div class="topbar">
       <div>
         <h1>Результаты анализа</h1>
-        <p class="muted">Kaggle version 19, smoke-run: 3 выбранных пользователя, 1 валидный результат.</p>
+        <p class="muted">Kaggle version 20, smoke-run: 3 пользователя, 1 валидный, 2 partial, 0 ошибок.</p>
       </div>
       <div class="badge">Рейтинг по overall confidence</div>
     </div>
-    <nav class="tabs" aria-label="Пользователи"><button class="tab-button active" data-tab="user_002065"><span>Leha_Garry</span><small>user_002065 · ошибка</small></button>
-<button class="tab-button" data-tab="user_000347"><span>Comrad_Kronosila</span><small>user_000347 · #1 / 0.78</small></button>
-<button class="tab-button" data-tab="user_001208"><span>polden21vek</span><small>user_001208 · ошибка</small></button></nav>
-    <section class="tab-panel active" id="user_002065">
+    <nav class="tabs" aria-label="Пользователи"><button class="tab-button active" data-tab="user_000347"><span>Comrad_Kronosila</span><small>user_000347 · #1 / 0.78</small></button><button class="tab-button" data-tab="user_002065"><span>Leha_Garry</span><small>user_002065 · #2 / 0.71 · partial</small></button><button class="tab-button" data-tab="user_001208"><span>polden21vek</span><small>user_001208 · #3 / 0.4 · partial</small></button></nav>
+    
+<section class="tab-panel active" id="user_000347">
   <section class="summary" aria-label="Сводка пользователя">
-    <div class="metric"><div class="label">Рейтинг</div><div class="value">нет</div></div>
-    <div class="metric"><div class="label">Анонимный ID</div><div class="value">user_002065</div></div>
-    <div class="metric"><div class="label">Имя</div><div class="value">Leha_Garry</div></div>
-    <div class="metric"><div class="label">Real ID</div><div class="value">7822462002</div></div>
-    <div class="metric"><div class="label">Уверенность</div><div class="value">нет</div></div>
-    <div class="metric"><div class="label">Статус</div><div class="value">Ошибка: All blocks failed analysis</div></div>
+    <div class="metric"><div class="label">Рейтинг</div><div class="value">#1</div></div>
+    <div class="metric"><div class="label">Анонимный ID</div><div class="value">user_000347</div></div>
+    <div class="metric"><div class="label">Имя</div><div class="value">Comrad_Kronosila</div></div>
+    <div class="metric"><div class="label">Real ID</div><div class="value">494681460</div></div>
+    <div class="metric"><div class="label">Уверенность</div><div class="value">0.78</div></div>
+    <div class="metric"><div class="label">Статус</div><div class="value">Валидный результат</div></div>
   </section>
 
   <section class="grid">
     <div class="section">
       <h2>Оси</h2>
-      <p class="muted">Валидный рейтинг недоступен: JSON обрезан. Ниже показан фрагмент ответа модели, его нельзя считать подтверждённым результатом.</p>
+      
+        <div class="score">
+          <div class="score-head"><span>Экономика</span><span>Лево 40 / Право 60 · conf 0.75</span></div>
+          <div class="bar"><span style="width: 40%"></span></div>
+        </div>
+        <div class="score">
+          <div class="score-head"><span>Власть</span><span>Авторитарно 70 / Либертариански 30 · conf 0.8</span></div>
+          <div class="bar"><span style="width: 70%"></span></div>
+        </div>
+        <div class="score">
+          <div class="score-head"><span>Наука</span><span>Научно 60 / Антинаучно 40 · conf 0.65</span></div>
+          <div class="bar"><span style="width: 60%"></span></div>
+        </div>
     </div>
     <div class="section">
       <h2>Идеологические сходства</h2>
-      <table><thead><tr><th>Направление</th><th>Оценка</th></tr></thead><tbody><tr><td colspan="2">Нет валидного результата анализа</td></tr></tbody></table>
+      <table><thead><tr><th>Направление</th><th>Оценка</th></tr></thead><tbody><tr><td>Консерватизм</td><td>50</td></tr><tr><td>Анархизм</td><td>40</td></tr><tr><td>Национализм</td><td>30</td></tr><tr><td>Либерализм</td><td>20</td></tr><tr><td>Фашизм/нацизм</td><td>20</td></tr><tr><td>Социал-демократия</td><td>10</td></tr><tr><td>Марксизм</td><td>10</td></tr><tr><td>Политическая индифферентность</td><td>0</td></tr></tbody></table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Статистика</h2>
+    <table><tbody>
+      <tr><th>Всего комментариев</th><td>517</td></tr>
+      <tr><th>Уникальных комментариев</th><td>470</td></tr>
+      <tr><th>Политических комментариев</th><td>228</td></tr>
+      <tr><th>Проанализировано в smoke-run</th><td>20</td></tr>
+      <tr><th>Protest rhetoric</th><td>30, confidence 0.6</td></tr>
+      <tr><th>Evidence</th><td>1 записей</td></tr>
+      <tr><th>Unknown topics</th><td>роль мигрантов в военных конфликтах, технологическая автономия в производстве, влияние санкций на медицинскую систему, структура прямой демократии в России, границы элиты и гетто</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="section"><h2>Evidence</h2><table><thead><tr><th>Категория</th><th>Комментарий</th><th>Цитата</th></tr></thead><tbody><tr><td>economic</td><td>#4957</td><td>опыт забастовок и митингов это не опыт революционеров</td></tr></tbody></table></section>
+
+  <section class="section">
+    <h2>Комментарии</h2>
+    <div class="comments">
+      <article class="comment">
+        <div class="comment-meta"><span>#23800</span><span>2026-02-10 16:43:13</span><span>vestnikburioriginals</span></div>
+        <p class="comment-text">депутаты гд приняли в i чтении законопроект об увеличении лимита сверхурочных работ до 240 часов.
+
+сейчас лимит сверхурочной работы установлен в 4 часа в течение двух дней подряд, но не более 120 часов в год.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#444</span><span>2026-02-09 07:32:38</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">потом будут роботами заменять рабочих. мигранты не особо нужны, как и люди в принципе. их уже вон в войнушках сжигают. а потом и на войнушках роботы будут.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#4254</span><span>2026-01-26 17:53:14</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">коммунист с либеральными мантрами. наверное так 😁</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#4788</span><span>2026-01-22 17:17:54</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">⚡️минтруд рф разработал законопроект о внесении изменений в трудовой кодекс (тк), предусматривающий использование с 1 сентября мессенджера max при взаимодействии работника и работодателя посредством электронного документооборота в сфере трудовых отношений, сообщил &quot;интерфаксу&quot; источник, знакомый с содержанием документа.
+
+согласно проекту, к многофункциональному сервису обмена информацией - мессенджеру max смогут подключаться информационные системы работодателя, а также цифровая платформа &quot;работа в россии&quot;.
+
+мы в telegram | мы в max</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#4957</span><span>2026-01-20 10:32:27</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">опять эти мантры про &quot;опыт&quot;.
+вы на уровне первоклашек и останетесь с таким подходом навсегда, ибо опыт забастовок и митингов это не опыт революционеров. 
+если вам не хватает опыта стран европы и сша и других стран - то я могу только руками развести.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#4961</span><span>2026-01-20 08:37:32</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">и вот с этими вы собираетесь демократическими митингами бороться? смешно 😅</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#5283</span><span>2026-01-18 02:05:30</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">❗️серийное производство терминала для широкополосного спутникового доступа в интернет будет развернуто в россии уже в текущем году. 
+
+об этом сказал глава госкорпорации &quot;роскосмос&quot; дмитрий баканов в эфире первого канала.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#5666</span><span>2026-01-10 18:57:29</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">скорее всего просто техника будет стоить дороже и кормиться с военных заказов будут вкуснее.
+
+америка не делает дешёвого, эффективного и массового оружия много. у них есть хорошая техника, но она в единичных экземплярах, как в мультиках путина.
+
+америка загибается, пока она сильнее китая только в военном потенциале, но это временно.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#5667</span><span>2026-01-10 18:32:56</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">а я где-то писал про поддержку монархии или буржуазной демократии?
+анархию без капитализма в целом могу поддержать, она мне ближе чем капитализм или монархия.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6351</span><span>2025-12-23 23:59:16</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">именно поэтому принимать решения должны все через прямую демократию. а задача партийтии выявлять проблемы, привлекать экспертов и предлагать решения для всеобщего голосования через способы прямой демократии</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6448</span><span>2025-12-23 15:28:17</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">однопартийность плоха лишь в случае, если рабочие массы перестают быть её сущностью. поэтому как раз прямая демократия залог того, что партия не скатится к кпсс</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6473</span><span>2025-12-22 18:43:44</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">социал-дарвиризм признак фашизма, так что закономерно призрение к жителям деревень</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6692</span><span>2025-12-21 07:47:32</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">я вижу к чему вы клоните и сразу хочу сказать, что это тупиковая ветвь. евролевые показали всю бесперспективность реформизма.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6706</span><span>2025-12-20 15:06:04</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">я не отказываю, я про то, чтобы слесарь вася голосовал, но не выдвигал законы, касаемые медицины.
+я как раз таки за то, чтобы люди совместно голосовали и принимали решения, но при этом не лезли в области, где ничего не смыслят.
+
+речь шла не про управление своим предприятием (которое я всецело поддерживаю, вне всяких сомнений), а про принятие решений во власти.
+когда проблема стоит не на конкретном предприятии, а для все отрасли вообще, условно против нас вводят санкции и у нас появляется дефицит лекарств, какой путь мы выберем? строить своё, закупать у соседей, просить специалистов из-за бугра, и тд.
+вот эти предложения вырабатывают специ в своей отрасли (может один выдвиженец от врачей или целая коллегия, которых так же выбирают) и выдвигают на всенародное голосование. а люди уже принимают решение через методы прямой демократии.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6736</span><span>2025-12-19 23:55:46</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">эксперты в написании и трактовке законов, а не на производстве. не надо мои слова перевирать.
+речь про экономистов во власти, в вопросах, доступных для специалистов, будь то транспорт, медицина и прочее. 
+их задача выявить проблему, огласить её для всех и предложить методы решения. а люди уже голосуют за один из вариантов или предлагают свой.
+
+я не против того, чтобы люди владели средствами производства, я это поддерживаю. речь про власть в стране.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6741</span><span>2025-12-19 22:07:36</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">классическое развитие капиталистического государства. пока ещё нет четкой градации где гетто, а где элита, я имею ввиду по всей россии, а не только в городах милионниках, но уже движемся в этом направлении.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6743</span><span>2025-12-19 21:29:00</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">им власть не нужна, они это уже столетие демонстрируют. у них даже попыток не было ее получить.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6744</span><span>2025-12-19 21:23:01</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">власть в стране у них имеется?
+если нет - вопрос времени когда их вышибут оттуда.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6749</span><span>2025-12-19 17:52:55</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">французы получили власть?</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#6751</span><span>2025-12-19 17:42:30</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">люди больше всего привязываются к коллективу, на сколько я заметил по общению и своим наблюдениям. если коллектив человека не устраивает - его никакими деньгами и собственностью не удержишь. квартира у тебя одна, поэтому и отношение к ней соответствующее. а вот коллектив и работу всегда можно поменять, даже если всё в стране принадлежит рабочим, общество поменялось очень сильно с 19 века и ожидать от них того, что они будут заботиться о предприятии - глупо и наивно.</p>
+      </article></div>
+  </section>
+</section>
+<section class="tab-panel" id="user_002065">
+  <section class="summary" aria-label="Сводка пользователя">
+    <div class="metric"><div class="label">Рейтинг</div><div class="value">#2</div></div>
+    <div class="metric"><div class="label">Анонимный ID</div><div class="value">user_002065</div></div>
+    <div class="metric"><div class="label">Имя</div><div class="value">Leha_Garry</div></div>
+    <div class="metric"><div class="label">Real ID</div><div class="value">7822462002</div></div>
+    <div class="metric"><div class="label">Уверенность</div><div class="value">0.71</div></div>
+    <div class="metric"><div class="label">Статус</div><div class="value">Partial: оценки восстановлены из обрезанного JSON</div></div>
+  </section>
+
+  <section class="section warning">
+    <h2>Partial response</h2>
+    <p>Модель обрезала JSON после content_analysis. Оценки сохранены, но evidence/contradictions/unknown_topics заменены безопасными пустыми значениями.</p>
+  </section>
+  <section class="grid">
+    <div class="section">
+      <h2>Оси</h2>
+      
+        <div class="score">
+          <div class="score-head"><span>Экономика</span><span>Лево 30 / Право 70 · conf 0.75</span></div>
+          <div class="bar"><span style="width: 30%"></span></div>
+        </div>
+        <div class="score">
+          <div class="score-head"><span>Власть</span><span>Авторитарно 85 / Либертариански 15 · conf 0.8</span></div>
+          <div class="bar"><span style="width: 85%"></span></div>
+        </div>
+        <div class="score">
+          <div class="score-head"><span>Наука</span><span>Научно 40 / Антинаучно 60 · conf 0.6</span></div>
+          <div class="bar"><span style="width: 40%"></span></div>
+        </div>
+    </div>
+    <div class="section">
+      <h2>Идеологические сходства</h2>
+      <table><thead><tr><th>Направление</th><th>Оценка</th></tr></thead><tbody><tr><td>Национализм</td><td>80</td></tr><tr><td>Консерватизм</td><td>70</td></tr><tr><td>Фашизм/нацизм</td><td>45</td></tr><tr><td>Либерализм</td><td>15</td></tr><tr><td>Социал-демократия</td><td>10</td></tr><tr><td>Марксизм</td><td>5</td></tr><tr><td>Политическая индифферентность</td><td>5</td></tr><tr><td>Анархизм</td><td>2</td></tr></tbody></table>
     </div>
   </section>
 
@@ -88,60 +256,23 @@
     <h2>Статистика</h2>
     <table><tbody>
       <tr><th>Всего комментариев</th><td>526</td></tr>
-      <tr><th>Уникальных комментариев</th><td>436</td></tr>
+      <tr><th>Уникальных комментариев</th><td>416</td></tr>
       <tr><th>Политических комментариев</th><td>234</td></tr>
       <tr><th>Проанализировано в smoke-run</th><td>12</td></tr>
-      <tr><th>Символов в сэмпле</th><td>4674</td></tr>
-      <tr><th>Protest rhetoric</th><td>Нет валидного результата анализа</td></tr>
-      <tr><th>Evidence</th><td>Нет валидного результата анализа</td></tr>
+      <tr><th>Protest rhetoric</th><td>60, confidence 0.7</td></tr>
+      <tr><th>Evidence</th><td>Нет evidence в partial-ответе</td></tr>
+      <tr><th>Unknown topics</th><td>model_response_truncated_after_content_analysis</td></tr>
     </tbody></table>
   </section>
 
-  <section class="section warning">
-  <h2>Ошибка анализа</h2>
-  <p>All blocks failed analysis</p>
-  <div class="draft"><h3>Черновые оценки из обрезанного JSON</h3><table><tbody><tr><th>economic</th><td>left 30 / right 70, confidence 0.75</td></tr><tr><th>authority</th><td>authoritarian 85 / libertarian 15, confidence 0.8</td></tr><tr><th>science</th><td>scientific 40 / anti-scientific 60, confidence 0.6</td></tr><tr><th>top ideology</th><td>nationalism 80, conservatism 70, fascism_nazism 45</td></tr><tr><th>protest rhetoric</th><td>60, confidence 0.7</td></tr></tbody></table></div><pre>{
-  &quot;content_analysis&quot;: {
-    &quot;axes&quot;: {
-      &quot;economic&quot;: {
-        &quot;left&quot;: 30,
-        &quot;right&quot;: 70,
-        &quot;confidence&quot;: 0.75
-      },
-      &quot;authority&quot;: {
-        &quot;authoritarian&quot;: 85,
-        &quot;libertarian&quot;: 15,
-        &quot;confidence&quot;: 0.8
-      },
-      &quot;science&quot;: {
-        &quot;scientific&quot;: 40,
-        &quot;anti_scientific&quot;: 60,
-        &quot;confidence&quot;: 0.6
-      }
-    },
-    &quot;ideological_similarity&quot;: {
-      &quot;liberalism&quot;: 15,
-      &quot;conservatism&quot;: 70,
-      &quot;social_democracy&quot;: 10,
-      &quot;marxism&quot;: 5,
-      &quot;anarchism&quot;: 2,
-      &quot;nationalism&quot;: 80,
-      &quot;fascism_nazism&quot;: 45,
-      &quot;political_indifference&quot;: 5
-    },
-    &quot;protest_rhetoric&quot;: {
-      &quot;score&quot;: 60,
-      &quot;confidence&quot;: 0.7
-    }
-  },
-  &quot;evi</pre>
-</section>
+  
 
   <section class="section">
     <h2>Комментарии</h2>
-    <div class="comments"><article class="comment">
-  <div class="comment-meta"><span>#16733</span><span>2026-02-24 21:24:39</span><span>ru_doy</span></div>
-  <p class="comment-text">я хорошо помню то утро. утро когда мир рухнул, все разделилось на &quot;до&quot; и &quot;после&quot;. &quot;до&quot; была тяжёлая жизнь строителя, левого активиста, &quot;после&quot; только неизвестность, пустота. через два дня я час стоял в очереди на запись в тро. тогда я не знал что границу пересекли 180 тыс. всрф и 110 тыс. мобилизованных &quot;лднр&quot;, а в запасе у них была армия в 1,3 млн. в то время как в украинских боевых частях было около 90 тыс и ещё 170 тыс в тыловых частях. плюс подавляющее превосходство в технике, артиллерии, в воздухе и тогда ещё на море. 
+    <div class="comments">
+      <article class="comment">
+        <div class="comment-meta"><span>#16733</span><span>2026-02-24 21:24:39</span><span>ru_doy</span></div>
+        <p class="comment-text">я хорошо помню то утро. утро когда мир рухнул, все разделилось на &quot;до&quot; и &quot;после&quot;. &quot;до&quot; была тяжёлая жизнь строителя, левого активиста, &quot;после&quot; только неизвестность, пустота. через два дня я час стоял в очереди на запись в тро. тогда я не знал что границу пересекли 180 тыс. всрф и 110 тыс. мобилизованных &quot;лднр&quot;, а в запасе у них была армия в 1,3 млн. в то время как в украинских боевых частях было около 90 тыс и ещё 170 тыс в тыловых частях. плюс подавляющее превосходство в технике, артиллерии, в воздухе и тогда ещё на море. 
 
 в этот день всрф захватили каховскую гэс, подошли к херсону, захватили аэропорт в гостомеле, серьезно продвинулись на севере. собственно везде кроме донецкой и части луганской областей это был марш на полной скорости. &quot;сво&quot; шла по плану. 
 
@@ -152,249 +283,99 @@
 в первые дни у семина вышло видео из рубрики писем. где какая-то женщина возмущалась, что одурманенные пропагандой украинцы массово идут в армию. мол, как так можно, с братским народом воевать? потом был жуков и все кого вы знаете. 
 
 в этот день в 22 во мне была только злость, тревога и пустота. я не понимал что будет завтра. сейчас я знаю и понимаю гораздо больше. и я верю что украинский и российские народы будут свободны и счастливы. будем жить.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17464</span><span>2026-02-21 07:55:47</span><span>ru_doy</span></div>
-  <p class="comment-text">ну очевидно что тогда они пойдут захватывать страны где сталина любят не так сильно - &quot;режим хоть и буржуазный, но антифашисткий&quot;. собственно они и так это делают, так что волгоград переименовывать не нужно.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18759</span><span>2026-02-18 19:53:26</span><span>ru_doy</span></div>
-  <p class="comment-text">ну россияне тоже страшные, 4 года &quot;2 армия мира&quot; не может победить &quot;колонию запада&quot;&quot;скакуа новую свинею&quot;. силища!</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18761</span><span>2026-02-18 19:46:33</span><span>ru_doy</span></div>
-  <p class="comment-text">по разному бывает. обычно такое происходит в узком кругу товарищей и никуда больше не уходит. об одном случае мне рассказал офицер в учебке в назидательных целях и введения в контекст войны. о другом рассказал друг видевший ситуацию лично. естественно военная полиция, прокуратура ничего об этом не знает. хотя к слову о &quot;нацистах&quot;, я слышал как какого-то бойца взяли за жопу за ношение символики третьего рейха. это не военное преступление, но нарушение закона о запрете нацизма.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18763</span><span>2026-02-18 19:28:18</span><span>ru_doy</span></div>
-  <p class="comment-text">он о том что мертвым украинцам будет так лучше - это следует из построения фразы. ну и вопрос там был &quot;как вы относитесь к украинцам&quot;, а не как вы относитесь к укр власти, нацистам и т.д. то есть опять, его спросили как он относится ко всем от новорожденных до стариков.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18774</span><span>2026-02-18 19:23:52</span><span>ru_doy</span></div>
-  <p class="comment-text">он в этой фразе указывает что это его мнение об украинцах, а не отдельных нацистах, то есть вообще всех, от грудничков до пенсионеров. 
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17464</span><span>2026-02-21 07:55:47</span><span>ru_doy</span></div>
+        <p class="comment-text">ну очевидно что тогда они пойдут захватывать страны где сталина любят не так сильно - &quot;режим хоть и буржуазный, но антифашисткий&quot;. собственно они и так это делают, так что волгоград переименовывать не нужно.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18759</span><span>2026-02-18 19:53:26</span><span>ru_doy</span></div>
+        <p class="comment-text">ну россияне тоже страшные, 4 года &quot;2 армия мира&quot; не может победить &quot;колонию запада&quot;&quot;скакуа новую свинею&quot;. силища!</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18761</span><span>2026-02-18 19:46:33</span><span>ru_doy</span></div>
+        <p class="comment-text">по разному бывает. обычно такое происходит в узком кругу товарищей и никуда больше не уходит. об одном случае мне рассказал офицер в учебке в назидательных целях и введения в контекст войны. о другом рассказал друг видевший ситуацию лично. естественно военная полиция, прокуратура ничего об этом не знает. хотя к слову о &quot;нацистах&quot;, я слышал как какого-то бойца взяли за жопу за ношение символики третьего рейха. это не военное преступление, но нарушение закона о запрете нацизма.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18763</span><span>2026-02-18 19:28:18</span><span>ru_doy</span></div>
+        <p class="comment-text">он о том что мертвым украинцам будет так лучше - это следует из построения фразы. ну и вопрос там был &quot;как вы относитесь к украинцам&quot;, а не как вы относитесь к укр власти, нацистам и т.д. то есть опять, его спросили как он относится ко всем от новорожденных до стариков.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18774</span><span>2026-02-18 19:23:52</span><span>ru_doy</span></div>
+        <p class="comment-text">он в этой фразе указывает что это его мнение об украинцах, а не отдельных нацистах, то есть вообще всех, от грудничков до пенсионеров. 
 
 поддерживай. но не удивляйся потом что россиян ненавидят. вы этот позор долго смывать будите.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18788</span><span>2026-02-18 19:19:54</span><span>ru_doy</span></div>
-  <p class="comment-text">&quot;один народ&quot;, но &quot;я считаю что всю эту нацистскую мразь надо вырезать, так будет лучше им самим и нам тоже, вот такое примерно мнение об украинцах&quot;</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18798</span><span>2026-02-18 19:17:51</span><span>ru_doy</span></div>
-  <p class="comment-text">да, всех русскоязычных убиваем, особенно русскоязычных украинцев. нацисты, чего уж тут.  
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18788</span><span>2026-02-18 19:19:54</span><span>ru_doy</span></div>
+        <p class="comment-text">&quot;один народ&quot;, но &quot;я считаю что всю эту нацистскую мразь надо вырезать, так будет лучше им самим и нам тоже, вот такое примерно мнение об украинцах&quot;</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18798</span><span>2026-02-18 19:17:51</span><span>ru_doy</span></div>
+        <p class="comment-text">да, всех русскоязычных убиваем, особенно русскоязычных украинцев. нацисты, чего уж тут.  
 
 а вообще хорошо бы факты военных преступлений, а не домыслы о спорных ситуациях. если не знаешь - зачем говорить.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18818</span><span>2026-02-18 19:06:25</span><span>ru_doy</span></div>
-  <p class="comment-text">да это тоже военное преступление, но справедливости ради смертность от него гораздо ниже, чем когда всрф приходят какой то город &quot;освобождать&quot;.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#19240</span><span>2026-02-18 18:47:02</span><span>ru_doy</span></div>
-  <p class="comment-text">не скажу, так как считаю что такие выражения не приемлемы в принципе. не бухти потом, когда украинский дип страйк в твой дом попадет. 
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18818</span><span>2026-02-18 19:06:25</span><span>ru_doy</span></div>
+        <p class="comment-text">да это тоже военное преступление, но справедливости ради смертность от него гораздо ниже, чем когда всрф приходят какой то город &quot;освобождать&quot;.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#19240</span><span>2026-02-18 18:47:02</span><span>ru_doy</span></div>
+        <p class="comment-text">не скажу, так как считаю что такие выражения не приемлемы в принципе. не бухти потом, когда украинский дип страйк в твой дом попадет. 
 
 на остальное не отвечу, потому что после этой фразы испытываю к тебе только омерзение.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#19250</span><span>2026-02-18 18:40:59</span><span>ru_doy</span></div>
-  <p class="comment-text">не ботоворю. путин совершил и совершает самую кровавую войну в европе с вмв. и кровь здесь льется моя, моих друзей, знакомых, соседей, соотечественников. за все это я считаю путина злом, да. если вам своих соотечественников и соседей из украины не жалко, что ж, это говорит только многое о вашем моральном облике и умственных способностях.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#19254</span><span>2026-02-18 18:27:59</span><span>ru_doy</span></div>
-  <p class="comment-text">я хочу вас огорчить. на мой взгляд победа украины в этой войне - сохранение основных территорий и государственности. речи об уничтожении режима в рф не идёт уже давно, да это собственно и нереально по многим причинам. 
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#19250</span><span>2026-02-18 18:40:59</span><span>ru_doy</span></div>
+        <p class="comment-text">не ботоворю. путин совершил и совершает самую кровавую войну в европе с вмв. и кровь здесь льется моя, моих друзей, знакомых, соседей, соотечественников. за все это я считаю путина злом, да. если вам своих соотечественников и соседей из украины не жалко, что ж, это говорит только многое о вашем моральном облике и умственных способностях.</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#19254</span><span>2026-02-18 18:27:59</span><span>ru_doy</span></div>
+        <p class="comment-text">я хочу вас огорчить. на мой взгляд победа украины в этой войне - сохранение основных территорий и государственности. речи об уничтожении режима в рф не идёт уже давно, да это собственно и нереально по многим причинам. 
 
 ликвидация путина, я подозреваю это очень сложная операция, тут как с мадуро не получится. он же не дурак подставляться. ну и такое покушение может реально вызвать ядерную эскалацию. для путина его жизнь - экзестенциальный вопрос. 
 
 в общем я б на такое не рассчитывал. тут все действительно зависит от самих россиян. 
 
 а вот в чем бы мы могли бы вам помочь - передача военного опыта, при условии что вы где то в европе. я здесь уже писал немного об этом. дело реально общее.</p>
-</article></div>
-  </section>
-</section>
-<section class="tab-panel" id="user_000347">
-  <section class="summary" aria-label="Сводка пользователя">
-    <div class="metric"><div class="label">Рейтинг</div><div class="value">#1</div></div>
-    <div class="metric"><div class="label">Анонимный ID</div><div class="value">user_000347</div></div>
-    <div class="metric"><div class="label">Имя</div><div class="value">Comrad_Kronosila</div></div>
-    <div class="metric"><div class="label">Real ID</div><div class="value">494681460</div></div>
-    <div class="metric"><div class="label">Уверенность</div><div class="value">0.78</div></div>
-    <div class="metric"><div class="label">Статус</div><div class="value">Успешно обработан</div></div>
-  </section>
-
-  <section class="grid">
-    <div class="section">
-      <h2>Оси</h2>
-      <div class="score">
-  <div class="score-head"><span>Экономика: left</span><span>40 / 100</span></div>
-  <div class="bar"><span style="width:40%"></span></div>
-  <div class="score-head muted"><span>right</span><span>60 / 100</span></div>
-</div>
-<div class="score">
-  <div class="score-head"><span>Власть: authoritarian</span><span>70 / 100</span></div>
-  <div class="bar red"><span style="width:70%"></span></div>
-  <div class="score-head muted"><span>libertarian</span><span>30 / 100</span></div>
-</div>
-<div class="score">
-  <div class="score-head"><span>Наука: scientific</span><span>60 / 100</span></div>
-  <div class="bar green"><span style="width:60%"></span></div>
-  <div class="score-head muted"><span>anti-scientific</span><span>40 / 100</span></div>
-</div>
-    </div>
-    <div class="section">
-      <h2>Идеологические сходства</h2>
-      <table><thead><tr><th>Направление</th><th>Оценка</th></tr></thead><tbody><tr><td>conservatism</td><td>50</td></tr>
-<tr><td>anarchism</td><td>40</td></tr>
-<tr><td>nationalism</td><td>30</td></tr>
-<tr><td>liberalism</td><td>20</td></tr>
-<tr><td>fascism_nazism</td><td>20</td></tr>
-<tr><td>social_democracy</td><td>10</td></tr>
-<tr><td>marxism</td><td>10</td></tr>
-<tr><td>political_indifference</td><td>0</td></tr></tbody></table>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Статистика</h2>
-    <table><tbody>
-      <tr><th>Всего комментариев</th><td>517</td></tr>
-      <tr><th>Уникальных комментариев</th><td>506</td></tr>
-      <tr><th>Политических комментариев</th><td>228</td></tr>
-      <tr><th>Проанализировано в smoke-run</th><td>20</td></tr>
-      <tr><th>Символов в сэмпле</th><td>4727</td></tr>
-      <tr><th>Protest rhetoric</th><td>30, confidence 0.6</td></tr>
-      <tr><th>Evidence</th><td>economic, comment 4957: опыт забастовок и митингов это не опыт революционеров</td></tr>
-    </tbody></table>
-  </section>
-
-  
-
-  <section class="section">
-    <h2>Комментарии</h2>
-    <div class="comments"><article class="comment">
-  <div class="comment-meta"><span>#23800</span><span>2026-02-10 16:43:13</span><span>vestnikburioriginals</span></div>
-  <p class="comment-text">депутаты гд приняли в i чтении законопроект об увеличении лимита сверхурочных работ до 240 часов.
-
-сейчас лимит сверхурочной работы установлен в 4 часа в течение двух дней подряд, но не более 120 часов в год.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#444</span><span>2026-02-09 07:32:38</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">потом будут роботами заменять рабочих. мигранты не особо нужны, как и люди в принципе. их уже вон в войнушках сжигают. а потом и на войнушках роботы будут.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#4254</span><span>2026-01-26 17:53:14</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">коммунист с либеральными мантрами. наверное так 😁</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#4788</span><span>2026-01-22 17:17:54</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">⚡️минтруд рф разработал законопроект о внесении изменений в трудовой кодекс (тк), предусматривающий использование с 1 сентября мессенджера max при взаимодействии работника и работодателя посредством электронного документооборота в сфере трудовых отношений, сообщил &quot;интерфаксу&quot; источник, знакомый с содержанием документа.
-
-согласно проекту, к многофункциональному сервису обмена информацией - мессенджеру max смогут подключаться информационные системы работодателя, а также цифровая платформа &quot;работа в россии&quot;.
-
-мы в telegram | мы в max</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#4957</span><span>2026-01-20 10:32:27</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">опять эти мантры про &quot;опыт&quot;.
-вы на уровне первоклашек и останетесь с таким подходом навсегда, ибо опыт забастовок и митингов это не опыт революционеров. 
-если вам не хватает опыта стран европы и сша и других стран - то я могу только руками развести.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#4961</span><span>2026-01-20 08:37:32</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">и вот с этими вы собираетесь демократическими митингами бороться? смешно 😅</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#5283</span><span>2026-01-18 02:05:30</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">❗️серийное производство терминала для широкополосного спутникового доступа в интернет будет развернуто в россии уже в текущем году. 
-
-об этом сказал глава госкорпорации &quot;роскосмос&quot; дмитрий баканов в эфире первого канала.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#5666</span><span>2026-01-10 18:57:29</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">скорее всего просто техника будет стоить дороже и кормиться с военных заказов будут вкуснее.
-
-америка не делает дешёвого, эффективного и массового оружия много. у них есть хорошая техника, но она в единичных экземплярах, как в мультиках путина.
-
-америка загибается, пока она сильнее китая только в военном потенциале, но это временно.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#5667</span><span>2026-01-10 18:32:56</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">а я где-то писал про поддержку монархии или буржуазной демократии?
-анархию без капитализма в целом могу поддержать, она мне ближе чем капитализм или монархия.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6351</span><span>2025-12-23 23:59:16</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">именно поэтому принимать решения должны все через прямую демократию. а задача партийтии выявлять проблемы, привлекать экспертов и предлагать решения для всеобщего голосования через способы прямой демократии</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6448</span><span>2025-12-23 15:28:17</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">однопартийность плоха лишь в случае, если рабочие массы перестают быть её сущностью. поэтому как раз прямая демократия залог того, что партия не скатится к кпсс</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6473</span><span>2025-12-22 18:43:44</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">социал-дарвиризм признак фашизма, так что закономерно призрение к жителям деревень</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6692</span><span>2025-12-21 07:47:32</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">я вижу к чему вы клоните и сразу хочу сказать, что это тупиковая ветвь. евролевые показали всю бесперспективность реформизма.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6706</span><span>2025-12-20 15:06:04</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">я не отказываю, я про то, чтобы слесарь вася голосовал, но не выдвигал законы, касаемые медицины.
-я как раз таки за то, чтобы люди совместно голосовали и принимали решения, но при этом не лезли в области, где ничего не смыслят.
-
-речь шла не про управление своим предприятием (которое я всецело поддерживаю, вне всяких сомнений), а про принятие решений во власти.
-когда проблема стоит не на конкретном предприятии, а для все отрасли вообще, условно против нас вводят санкции и у нас появляется дефицит лекарств, какой путь мы выберем? строить своё, закупать у соседей, просить специалистов из-за бугра, и тд.
-вот эти предложения вырабатывают специ в своей отрасли (может один выдвиженец от врачей или целая коллегия, которых так же выбирают) и выдвигают на всенародное голосование. а люди уже принимают решение через методы прямой демократии.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6736</span><span>2025-12-19 23:55:46</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">эксперты в написании и трактовке законов, а не на производстве. не надо мои слова перевирать.
-речь про экономистов во власти, в вопросах, доступных для специалистов, будь то транспорт, медицина и прочее. 
-их задача выявить проблему, огласить её для всех и предложить методы решения. а люди уже голосуют за один из вариантов или предлагают свой.
-
-я не против того, чтобы люди владели средствами производства, я это поддерживаю. речь про власть в стране.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6741</span><span>2025-12-19 22:07:36</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">классическое развитие капиталистического государства. пока ещё нет четкой градации где гетто, а где элита, я имею ввиду по всей россии, а не только в городах милионниках, но уже движемся в этом направлении.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6743</span><span>2025-12-19 21:29:00</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">им власть не нужна, они это уже столетие демонстрируют. у них даже попыток не было ее получить.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6744</span><span>2025-12-19 21:23:01</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">власть в стране у них имеется?
-если нет - вопрос времени когда их вышибут оттуда.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6749</span><span>2025-12-19 17:52:55</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">французы получили власть?</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#6751</span><span>2025-12-19 17:42:30</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">люди больше всего привязываются к коллективу, на сколько я заметил по общению и своим наблюдениям. если коллектив человека не устраивает - его никакими деньгами и собственностью не удержишь. квартира у тебя одна, поэтому и отношение к ней соответствующее. а вот коллектив и работу всегда можно поменять, даже если всё в стране принадлежит рабочим, общество поменялось очень сильно с 19 века и ожидать от них того, что они будут заботиться о предприятии - глупо и наивно.</p>
-</article></div>
+      </article></div>
   </section>
 </section>
 <section class="tab-panel" id="user_001208">
   <section class="summary" aria-label="Сводка пользователя">
-    <div class="metric"><div class="label">Рейтинг</div><div class="value">нет</div></div>
+    <div class="metric"><div class="label">Рейтинг</div><div class="value">#3</div></div>
     <div class="metric"><div class="label">Анонимный ID</div><div class="value">user_001208</div></div>
     <div class="metric"><div class="label">Имя</div><div class="value">polden21vek</div></div>
     <div class="metric"><div class="label">Real ID</div><div class="value">1871636505</div></div>
-    <div class="metric"><div class="label">Уверенность</div><div class="value">нет</div></div>
-    <div class="metric"><div class="label">Статус</div><div class="value">Ошибка: All blocks failed analysis</div></div>
+    <div class="metric"><div class="label">Уверенность</div><div class="value">0.4</div></div>
+    <div class="metric"><div class="label">Статус</div><div class="value">Partial: оценки восстановлены из обрезанного JSON</div></div>
   </section>
 
+  <section class="section warning">
+    <h2>Partial response</h2>
+    <p>Модель обрезала JSON после content_analysis. Оценки сохранены, но evidence/contradictions/unknown_topics заменены безопасными пустыми значениями.</p>
+  </section>
   <section class="grid">
     <div class="section">
       <h2>Оси</h2>
-      <p class="muted">Валидный рейтинг недоступен: JSON обрезан. Ниже показан фрагмент ответа модели, его нельзя считать подтверждённым результатом.</p>
+      
+        <div class="score">
+          <div class="score-head"><span>Экономика</span><span>Лево 50 / Право 50 · conf 0.3</span></div>
+          <div class="bar"><span style="width: 50%"></span></div>
+        </div>
+        <div class="score">
+          <div class="score-head"><span>Власть</span><span>Авторитарно 90 / Либертариански 10 · conf 0.7</span></div>
+          <div class="bar"><span style="width: 90%"></span></div>
+        </div>
+        <div class="score">
+          <div class="score-head"><span>Наука</span><span>Научно 30 / Антинаучно 70 · conf 0.2</span></div>
+          <div class="bar"><span style="width: 30%"></span></div>
+        </div>
     </div>
     <div class="section">
       <h2>Идеологические сходства</h2>
-      <table><thead><tr><th>Направление</th><th>Оценка</th></tr></thead><tbody><tr><td colspan="2">Нет валидного результата анализа</td></tr></tbody></table>
+      <table><thead><tr><th>Направление</th><th>Оценка</th></tr></thead><tbody><tr><td>Марксизм</td><td>85</td></tr><tr><td>Национализм</td><td>30</td></tr><tr><td>Консерватизм</td><td>20</td></tr><tr><td>Политическая индифферентность</td><td>20</td></tr><tr><td>Социал-демократия</td><td>15</td></tr><tr><td>Либерализм</td><td>10</td></tr><tr><td>Фашизм/нацизм</td><td>10</td></tr><tr><td>Анархизм</td><td>5</td></tr></tbody></table>
     </div>
   </section>
 
@@ -402,76 +383,38 @@
     <h2>Статистика</h2>
     <table><tbody>
       <tr><th>Всего комментариев</th><td>548</td></tr>
-      <tr><th>Уникальных комментариев</th><td>507</td></tr>
+      <tr><th>Уникальных комментариев</th><td>445</td></tr>
       <tr><th>Политических комментариев</th><td>167</td></tr>
       <tr><th>Проанализировано в smoke-run</th><td>8</td></tr>
-      <tr><th>Символов в сэмпле</th><td>4731</td></tr>
-      <tr><th>Protest rhetoric</th><td>Нет валидного результата анализа</td></tr>
-      <tr><th>Evidence</th><td>Нет валидного результата анализа</td></tr>
+      <tr><th>Protest rhetoric</th><td>40, confidence 0.4</td></tr>
+      <tr><th>Evidence</th><td>Нет evidence в partial-ответе</td></tr>
+      <tr><th>Unknown topics</th><td>model_response_truncated_after_content_analysis</td></tr>
     </tbody></table>
   </section>
 
-  <section class="section warning">
-  <h2>Ошибка анализа</h2>
-  <p>All blocks failed analysis</p>
-  <div class="draft"><h3>Черновые оценки из обрезанного JSON</h3><table><tbody><tr><th>economic</th><td>left 50 / right 50, confidence 0.3</td></tr><tr><th>authority</th><td>authoritarian 90 / libertarian 10, confidence 0.7</td></tr><tr><th>science</th><td>scientific 30 / anti-scientific 70, confidence 0.2</td></tr><tr><th>top ideology</th><td>marxism 85, nationalism 30, conservatism 20</td></tr><tr><th>protest rhetoric</th><td>40, confidence 0.4</td></tr></tbody></table></div>
-  <pre>{
-  &quot;content_analysis&quot;: {
-    &quot;axes&quot;: {
-      &quot;economic&quot;: {
-        &quot;left&quot;: 50,
-        &quot;right&quot;: 50,
-        &quot;confidence&quot;: 0.3
-      },
-      &quot;authority&quot;: {
-        &quot;authoritarian&quot;: 90,
-        &quot;libertarian&quot;: 10,
-        &quot;confidence&quot;: 0.7
-      },
-      &quot;science&quot;: {
-        &quot;scientific&quot;: 30,
-        &quot;anti_scientific&quot;: 70,
-        &quot;confidence&quot;: 0.2
-      }
-    },
-    &quot;ideological_similarity&quot;: {
-      &quot;liberalism&quot;: 10,
-      &quot;conservatism&quot;: 20,
-      &quot;social_democracy&quot;: 15,
-      &quot;marxism&quot;: 85,
-      &quot;anarchism&quot;: 5,
-      &quot;nationalism&quot;: 30,
-      &quot;fascism_nazism&quot;: 10,
-      &quot;political_indifference&quot;: 20
-    },
-    &quot;protest_rhetoric&quot;: {
-      &quot;score&quot;: 40,
-      &quot;confidence&quot;: 0.4
-    }
-  },
-  &quot;ev</pre>
-</section>
+  
 
   <section class="section">
     <h2>Комментарии</h2>
-    <div class="comments"><article class="comment">
-  <div class="comment-meta"><span>#17356</span><span>2026-02-22 15:54:02</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">знаешь что? что она кусочек от донатов скинула?</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17394</span><span>2026-02-21 13:36:50</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">61% россиян работают не ради денег, а за идею — опрос вциома. @ruseconomica</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17409</span><span>2026-02-21 12:28:56</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">хотя вот есть еще
+    <div class="comments">
+      <article class="comment">
+        <div class="comment-meta"><span>#17356</span><span>2026-02-22 15:54:02</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">знаешь что? что она кусочек от донатов скинула?</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17394</span><span>2026-02-21 13:36:50</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">61% россиян работают не ради денег, а за идею — опрос вциома. @ruseconomica</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17409</span><span>2026-02-21 12:28:56</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">хотя вот есть еще
 
 одного из подсудимых, андрея пашинского, суд приговорил к расстрелу, другим, в частности василию чуприну и девяти его коллегам, дал по 10 лет, еще шести человекам – по пять лет и двум – по полтора года заключения. в приговоре было сказано:
 «по делу установлено, что осужденные, будучи направлены районными организациями во главе с пашинским для усиления работы по хлебозаготовкам в 3 сельсоветах вешенского района, в борьбе против саботажа, организованного кулачеством, не только стали на путь исключительного применения репрессивных мер, но вышли далеко за пределы законно допустимых форм репрессий, совершив при этом ряд насилий и бесчинств».</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17410</span><span>2026-02-21 12:24:09</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">постановление политбюро цк вкп(б) о положении в вешенском районе в связи с хлебозаготовками 1*
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17410</span><span>2026-02-21 12:24:09</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">постановление политбюро цк вкп(б) о положении в вешенском районе в связи с хлебозаготовками 1*
 
 20/11. о вешенском районе (политбюро от 23 апреля 1933 г., пр. no 136, п. 8).
 
@@ -490,14 +433,14 @@
 5. все другие меры наказания, вынесенные партийными и советскими органами в отношении т. плоткина и пашинского, считать аннулированными.
 
 1* из протокола no 141 заседания политбюро цк вкп(б) от 15 июля 1933 г.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17411</span><span>2026-02-21 12:23:52</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">к сожалению позже обличенные члены партии и крайкомов отделались выговорами и временными отстранениями от работы</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17412</span><span>2026-02-21 12:21:35</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">и. в. сталин — м. а.шолохову
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17411</span><span>2026-02-21 12:23:52</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">к сожалению позже обличенные члены партии и крайкомов отделались выговорами и временными отстранениями от работы</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17412</span><span>2026-02-21 12:21:35</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">и. в. сталин — м. а.шолохову
 6 мая 1933 г.
 дорогой тов. шолохов!
 оба ваши письма получены, как вам известно. помощь, какую требовали, оказана уже.
@@ -508,15 +451,15 @@
 ну, всего хорошего и жму вашу руку.
 
 ваш и. сталин.</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#17413</span><span>2026-02-21 12:20:51</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">а история с письмом шолохова имела место быть и был и ответ сталина на это письмо</p>
-</article>
-<article class="comment">
-  <div class="comment-meta"><span>#18024</span><span>2026-02-20 11:08:36</span><span>d_tyazhkun</span></div>
-  <p class="comment-text">но, хочу заметить это достижение буржуазии. они сманивают в принципе хороших, но глупых, девочек, заниматься ерундой или антикоммунизмом. инструментами выступают семин и батов.</p>
-</article></div>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#17413</span><span>2026-02-21 12:20:51</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">а история с письмом шолохова имела место быть и был и ответ сталина на это письмо</p>
+      </article>
+      <article class="comment">
+        <div class="comment-meta"><span>#18024</span><span>2026-02-20 11:08:36</span><span>d_tyazhkun</span></div>
+        <p class="comment-text">но, хочу заметить это достижение буржуазии. они сманивают в принципе хороших, но глупых, девочек, заниматься ерундой или антикоммунизмом. инструментами выступают семин и батов.</p>
+      </article></div>
   </section>
 </section>
   </main>
