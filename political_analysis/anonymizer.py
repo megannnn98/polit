@@ -7,6 +7,7 @@ import logging
 import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +103,9 @@ class Anonymizer:
         if not structure.users_table or not structure.users_id_column:
             raise ValueError("Cannot build mapping: users table not identified")
 
-        conn = sqlite3.connect(str(db_path))
+        conn = sqlite3.connect(
+            f"file:{quote(str(Path(db_path).resolve()))}?mode=ro", uri=True
+        )
         try:
             cur = conn.execute(
                 f"SELECT {structure.users_id_column} FROM {structure.users_table} "

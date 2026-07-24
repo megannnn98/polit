@@ -6,6 +6,7 @@ import sqlite3
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +192,9 @@ def explore_database(db_path: str | Path) -> DBStructure:
 
     structure = DBStructure(path=str(path))
 
-    conn = sqlite3.connect(str(path))
+    # Read-only: source DB may live on a read-only mount (e.g. Kaggle input),
+    # where sqlite3's default rwc open mode fails with "unable to open database file"
+    conn = sqlite3.connect(f"file:{quote(str(path.resolve()))}?mode=ro", uri=True)
     try:
         cur = conn.execute(
             "SELECT name, type FROM sqlite_master "

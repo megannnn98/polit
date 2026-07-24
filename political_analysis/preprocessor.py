@@ -7,6 +7,7 @@ import sqlite3
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +122,9 @@ def load_user_comments(
     if not structure.messages_table or not structure.users_table:
         raise ValueError("Messages or users table not identified")
 
-    conn = sqlite3.connect(str(db_path))
+    conn = sqlite3.connect(
+        f"file:{quote(str(Path(db_path).resolve()))}?mode=ro", uri=True
+    )
     try:
         query = f"""
             SELECT m.{structure.messages_id_column or 'rowid'},
