@@ -203,19 +203,39 @@ def _extract_json(text: str) -> dict | None:
 def split_into_blocks(
     comments: list[dict],
     max_comments_per_block: int = 50,
+    max_chars_per_block: int = 16000,
 ) -> list[list[dict]]:
     """Разбивает комментарии на блоки для обработки.
+
+    Блок ограничен и числом комментариев, и суммарной длиной текста —
+    иначе несколько длинных сообщений в одном блоке из max_comments_per_block
+    штук могут дать промпт в тысячи токенов и уронить attention в OOM
+    (квадратичный рост памяти от длины последовательности).
 
     Args:
         comments: все комментарии
         max_comments_per_block: макс. комментариев в блоке
+        max_chars_per_block: макс. суммарная длина текста в блоке (символы)
 
     Returns:
         список блоков
     """
-    blocks = []
-    for i in range(0, len(comments), max_comments_per_block):
-        blocks.append(comments[i : i + max_comments_per_block])
+    blocks: list[list[dict]] = []
+    current: list[dict] = []
+    current_chars = 0
+    for c in comments:
+        text_len = len(c["text"])
+        if current and (
+            len(current) >= max_comments_per_block
+            or current_chars + text_len > max_chars_per_block
+        ):
+            blocks.append(current)
+            current = []
+            current_chars = 0
+        current.append(c)
+        current_chars += text_len
+    if current:
+        blocks.append(current)
     return blocks
 
 

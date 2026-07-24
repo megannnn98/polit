@@ -40,6 +40,7 @@ class PipelineConfig:
     output_dir: str = "."
     max_retries: int = 1
     max_comments_per_block: int = 50
+    max_chars_per_block: int = 16000
     stability_runs: int = 1
     stability_threshold: float = 15.0
 
@@ -59,6 +60,7 @@ class PipelineConfig:
             "output_dir": self.output_dir,
             "max_retries": self.max_retries,
             "max_comments_per_block": self.max_comments_per_block,
+            "max_chars_per_block": self.max_chars_per_block,
             "stability_runs": self.stability_runs,
             "stability_threshold": self.stability_threshold,
         }
@@ -223,7 +225,11 @@ class Pipeline:
         ]
 
         # Split into blocks if too many
-        blocks = split_into_blocks(comments_for_model, self.config.max_comments_per_block)
+        blocks = split_into_blocks(
+            comments_for_model,
+            self.config.max_comments_per_block,
+            self.config.max_chars_per_block,
+        )
 
         block_results: list[dict] = []
         for block_idx, block in enumerate(blocks):
