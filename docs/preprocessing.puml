@@ -1,0 +1,68 @@
+@startuml preprocessing
+title Предобработка комментариев (load_user_comments)
+
+skinparam activityDiamondBackgroundColor #FFE0B2
+
+start
+
+:Загрузка всех сообщений из БД;
+note right
+  SELECT id, user, text, date, channel
+  ORDER BY user, date
+end note
+
+:Группировка по user_id;
+
+partition "Для каждого пользователя" #E3F2FD {
+  :Получить все сообщения;
+
+  if (Пустые сообщения?) then (да)
+    :Удалить пустые;
+  endif
+
+  :Нормализация текста\n( stripping + lower );
+
+  if (Дубликаты?) then (да)
+    :Удалить дубликаты\n( по normalized text );
+  endif
+
+  if (len(unique) < min_comments?) then (да)
+    #FFCDD2:Пропустить пользователя;
+    stop
+  endif
+
+  if (Длина < min_comment_length?) then (да)
+    :Удалить короткие;
+  endif
+
+  if (Осталось < min_comments?) then (да)
+    #FFCDD2:Пропустить пользователя;
+    stop
+  endif
+
+  partition "Классификация сообщений" {
+    :Определить цитаты\n(_is_quote);
+    :Отделить собственный текст\n(_extract_own_text);
+    note right: Только для\nподтверждённых цитат
+  }
+
+  partition "Фильтр политического контента" {
+    :Проверить _is_political()\n( ключевые слова );
+
+    if (Есть политические?) then (да)
+      :Сохранить political_comments;
+    else (нет)
+      #FFCDD2:Пропустить пользователя\n(skipped_political++);
+      stop
+    endif
+  }
+
+  :Создать UserComments\n(anonymous_id, stats);
+  :Добавить в results;
+}
+
+:Вернуть list[UserComments];
+
+stop
+
+@enduml

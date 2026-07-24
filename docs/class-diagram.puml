@@ -1,0 +1,222 @@
+@startuml class-diagram
+title Классы пакета political_analysis
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "political_analysis" {
+
+  package "db_explorer" {
+    class Column {
+      +name: str
+      +type: str
+      +notnull: bool
+      +pk: bool
+      +default: str | None
+    }
+
+    class TableInfo {
+      +name: str
+      +columns: list[Column]
+      +row_count: int
+      +foreign_keys: list[dict]
+      +indexes: list[str]
+    }
+
+    class DBStructure {
+      +path: str
+      +tables: list[TableInfo]
+      +users_table: str | None
+      +messages_table: str | None
+      +users_id_column: str | None
+      +messages_text_column: str | None
+      +summary() str
+    }
+
+    Column "1" *-- "*" TableInfo
+    TableInfo "1" *-- "*" DBStructure
+  }
+
+  package "anonymizer" {
+    class Anonymizer {
+      -mapping: dict[int, str]
+      -reverse: dict[str, int]
+      -counter: int
+      +anonymize(real_id: int) str
+      +deanonymize(anon_id: str) int | None
+      +save_mapping(base_dir) Path
+      +load_mapping(base_dir) Anonymizer
+      +delete_mapping(base_dir) bool
+      +build_from_database(db_path, structure) Anonymizer
+    }
+  }
+
+  package "preprocessor" {
+    class CommentRecord {
+      +original_id: int
+      +text: str
+      +date: str
+      +channel: str
+      +is_quote: bool
+      +original_length: int
+    }
+
+    class UserComments {
+      +anonymous_id: str
+      +real_id: int
+      +total_comments: int
+      +unique_comments: int
+      +political_comments: int
+      +comments: list[CommentRecord]
+    }
+
+    UserComments "1" *-- "*" CommentRecord
+  }
+
+  package "model_loader" {
+    class ModelConfig {
+      +model_id: str
+      +max_new_tokens: int
+      +temperature: float
+      +do_sample: bool
+      +seed: int
+    }
+  }
+
+  package "validator" {
+    class EconomicAxis {
+      +left: int | None
+      +right: int | None
+      +confidence: float | None
+      +check_sum() self
+    }
+    class AuthorityAxis {
+      +authoritarian: int | None
+      +libertarian: int | None
+      +confidence: float | None
+      +check_sum() self
+    }
+    class ScienceAxis {
+      +scientific: int | None
+      +anti_scientific: int | None
+      +confidence: float | None
+      +check_sum() self
+    }
+    class Axes {
+      +economic: EconomicAxis
+      +authority: AuthorityAxis
+      +science: ScienceAxis
+    }
+    class IdeologicalSimilarity {
+      +liberalism: int | None
+      +conservatism: int | None
+      +social_democracy: int | None
+      +marxism: int | None
+      +anarchism: int | None
+      +nationalism: int | None
+      +fascism_nazism: int | None
+      +political_indifference: int | None
+    }
+    class ProtestRhetoric {
+      +score: int | None
+      +confidence: float | None
+    }
+    class EvidenceItem {
+      +comment_id: int | str
+      +quote: str
+    }
+    class ContentAnalysis {
+      +axes: Axes
+      +ideological_similarity: IdeologicalSimilarity
+      +protest_rhetoric: ProtestRhetoric
+    }
+    class AnalysisResponse {
+      +content_analysis: ContentAnalysis
+      +evidence: dict[str, list[EvidenceItem]]
+      +contradictions: list
+      +unknown_topics: list[str]
+      +overall_confidence: float
+      +insufficient_data: bool
+    }
+
+    Axes *-- EconomicAxis
+    Axes *-- AuthorityAxis
+    Axes *-- ScienceAxis
+    ContentAnalysis *-- Axes
+    ContentAnalysis *-- IdeologicalSimilarity
+    ContentAnalysis *-- ProtestRhetoric
+    AnalysisResponse *-- ContentAnalysis
+  }
+
+  package "analyzer" {
+    class AnalysisResult {
+      +raw_response: str
+      +parsed_json: dict | None
+      +is_valid: bool
+      +error: str | None
+    }
+  }
+
+  package "storage" {
+    class Storage {
+      -output_dir: Path
+      -db_path: Path
+      -_conn: sqlite3.Connection
+      +start_run(config) str
+      +complete_run(run_id, stats)
+      +save_user_result(...)
+      +save_error(...)
+      +is_user_processed(anon_id, run_id) bool
+      +save_config(config)
+      +save_summary(results)
+      +close()
+    }
+  }
+
+  package "pipeline" {
+    class PipelineConfig {
+      +database_path: str
+      +model_id: str
+      +min_comments: int
+      +min_comment_length: int
+      +max_comments_per_user: int
+      +max_input_tokens: int
+      +max_new_tokens: int
+      +seed: int
+      +resume: bool
+      +to_dict() dict
+    }
+    class PipelineState {
+      +total_users: int
+      +processed_users: int
+      +skipped_users: int
+      +error_users: int
+      +results: list[dict]
+    }
+    class Pipeline {
+      -config: PipelineConfig
+      -storage: Storage
+      -anonymizer: Anonymizer
+      -model
+      -tokenizer
+      -run_id: str
+      -state: PipelineState
+      +run() PipelineState
+      -_process_user(uc) dict
+      -_analyze_block(comments) AnalysisResult
+      -_save_checkpoint()
+    }
+  }
+}
+
+Pipeline --> PipelineConfig
+Pipeline --> PipelineState
+Pipeline --> Storage
+Pipeline --> Anonymizer
+Pipeline ..> DBStructure : uses
+Pipeline ..> UserComments : processes
+Pipeline ..> AnalysisResult : produces
+Pipeline ..> AnalysisResponse : validates
+
+@enduml

@@ -1,0 +1,66 @@
+@startuml block-analysis
+title Анализ блока комментариев с retry (Pipeline._analyze_block)
+
+skinparam sequenceArrowThickness 2
+skinparam maxMessageSize 200
+
+participant "Pipeline" as P
+participant "analyzer" as A
+participant "validator" as V
+participant "Qwen3-4B" as LLM
+database "analysis.db" as dst
+
+P -> P : split_into_blocks(comments, max_per_block=50)
+
+== Обработка блока ==
+
+loop Для каждого блока
+  P -> A : run_inference(model, tokenizer, block)
+  A -> A : build_analysis_prompt(block)
+  A -> A : SYSTEM_PROMPT + user prompt
+  A -> LLM : generate(max_new_tokens, do_sample=false, seed)
+  LLM --> A : raw response
+  A -> A : _extract_json(response)
+  alt JSON валиден
+    A --> P : AnalysisResult(is_valid=True)
+  else JSON невалиден
+    A --> P : AnalysisResult(error="Failed to extract JSON")
+  end
+end
+
+== Merge результатов блоков ==
+
+P -> A : merge_block_results(block_results)
+A -> A : weighted average для осей
+A -> A : extend + deduplicate evidence
+A -> A : union contradictions, unknown_topics
+A --> P : merged dict
+
+== Retry loop для валидации ==
+
+P -> A : validate_analysis_response(merged, comment_ids)
+A -> V : AnalysisResponse(**json)
+V -> V : Pydantic validation
+V -> V : model_validator: check_sum()
+note right: Автокоррекция\nleft+right=100\nс logging.warning
+
+alt validation OK
+  V --> A : (response, errors=[])
+  A --> P : validated result
+else validation ERROR
+  V --> A : (response, errors=[...])
+  A --> P : errors list
+  P -> P : build_correction_prompt(errors)
+  P -> LLM : correction prompt (retry)
+  LLM --> P : corrected response
+  P -> V : validate again
+  alt retry OK
+    V --> P : validated
+  else retry FAIL
+    V --> P : errors remain
+    P -> dst : INSERT INTO processing_errors
+    P -> P : log error, continue
+  end
+end
+
+@enduml

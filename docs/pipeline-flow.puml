@@ -1,0 +1,93 @@
+@startuml pipeline-flow
+title Основной конвейер анализа (Pipeline.run)
+
+skinparam sequenceArrowThickness 2
+skinparam maxMessageSize 200
+
+actor User
+participant "Pipeline" as P
+participant "db_explorer" as DB
+participant "Anonymizer" as A
+participant "preprocessor" as PP
+participant "model_loader" as ML
+participant "Storage" as S
+database "app.db" as src
+database "analysis.db" as dst
+
+User -> P : run()
+activate P
+
+== Этап 1: Исследование БД ==
+
+P -> DB : explore_database(path)
+DB -> src : PRAGMA table_info / foreign_key_list
+src --> DB : schema + row counts
+DB --> P : DBStructure
+
+== Этап 2: Анонимизация ==
+
+P -> A : build_from_database(path, structure)
+A -> src : SELECT user_id ORDER BY user_id
+src --> A : user IDs
+A --> A : mapping[id] = user_NNNNNN
+A -> A : save_mapping(output_dir)
+A --> P : Anonymizer
+
+== Этап 3: Загрузка комментариев ==
+
+P -> PP : load_user_comments(path, structure, anonymizer)
+PP -> src : SELECT messages JOIN users
+src --> PP : raw messages
+loop Для каждого пользователя
+  PP -> PP : удалить пустые
+  PP -> PP : удалить дубликаты
+  PP -> PP : удалить короткие (< min_comment_length)
+  PP -> PP :分离 цитаты от собственного текста
+  PP -> PP : фильтр _is_political()
+  note right: Пропустить, если\n0 политических
+end
+PP --> P : list[UserComments]
+
+== Этап 4: Загрузка модели ==
+
+P -> ML : load_model(config)
+ML -> ML : BitsAndBytes 4-bit quantization
+ML -> ML : device_map="auto"
+ML --> P : (model, tokenizer)
+
+== Этап 5: Запуск прогона ==
+
+P -> S : start_run(config)
+S -> dst : INSERT INTO analysis_runs
+S --> P : run_id
+
+== Этап 6: Обработка пользователей ==
+
+loop Для каждого UserComments [i/total]
+  alt уже обработан (resume)
+    P -> S : is_user_processed(anon_id, run_id)
+    S --> P : True
+    P -> P : skip
+  else новый пользователь
+    P -> P : _process_user(uc)
+    note right: См. diagram\nblock-analysis
+    P -> S : save_user_result(...)
+    S -> dst : INSERT results
+    S -> S : append results.jsonl
+  end
+  alt (i+1) % 10 == 0
+    P -> P : _save_checkpoint()
+  end
+end
+
+== Этап 7: Завершение ==
+
+P -> S : complete_run(run_id, stats)
+S -> dst : UPDATE analysis_runs
+P -> S : save_summary(results)
+S -> S : write summary.csv
+P --> User : PipelineState
+
+deactivate P
+
+@enduml
