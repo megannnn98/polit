@@ -235,6 +235,7 @@ class Storage:
             "unknown_topics": unknown_topics,
             "overall_confidence": overall_confidence,
             "insufficient_data": insufficient_data,
+            "partial_response": analysis.get("partial_response", False),
             "disclaimer": "Результат описывает политическое содержание предоставленных сообщений и не является достоверным определением личных убеждений автора.",
         }
         with open(self.jsonl_path, "a", encoding="utf-8") as f:

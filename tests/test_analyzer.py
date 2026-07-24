@@ -53,6 +53,37 @@ def test_extract_json_invalid():
     assert result is None
 
 
+def test_extract_json_recovers_truncated_after_content_analysis():
+    """Проверяет fallback для ответа, оборванного после content_analysis."""
+    text = """{
+  "content_analysis": {
+    "axes": {
+      "economic": {"left": 30, "right": 70, "confidence": 0.75},
+      "authority": {"authoritarian": 85, "libertarian": 15, "confidence": 0.8},
+      "science": {"scientific": 40, "anti_scientific": 60, "confidence": 0.6}
+    },
+    "ideological_similarity": {
+      "liberalism": 15,
+      "conservatism": 70,
+      "social_democracy": 10,
+      "marxism": 5,
+      "anarchism": 2,
+      "nationalism": 80,
+      "fascism_nazism": 45,
+      "political_indifference": 5
+    },
+    "protest_rhetoric": {"score": 60, "confidence": 0.7}
+  },
+  "ev"""
+    result = _extract_json(text)
+    assert result is not None
+    assert result["partial_response"] is True
+    assert result["content_analysis"]["axes"]["economic"]["right"] == 70
+    assert result["content_analysis"]["ideological_similarity"]["nationalism"] == 80
+    assert result["evidence"] == {}
+    assert result["overall_confidence"] == 0.71
+
+
 def test_split_into_blocks():
     """Проверяет разбиение на блоки."""
     items = [{"text": str(i)} for i in range(10)]

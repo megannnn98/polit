@@ -300,6 +300,7 @@ class Pipeline:
             "unknown_topics": merged.get("unknown_topics", []),
             "overall_confidence": merged.get("overall_confidence", 0.0),
             "insufficient_data": merged.get("insufficient_data", False),
+            "partial_response": merged.get("partial_response", False),
             "disclaimer": "Результат описывает политическое содержание предоставленных сообщений и не является достоверным определением личных убеждений автора.",
         }
         return record

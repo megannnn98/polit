@@ -210,8 +210,66 @@ def _extract_json(text: str) -> dict | None:
     if parsed is not None:
         return parsed
 
+    partial = _extract_partial_content_analysis(text)
+    if partial is not None:
+        logger.warning("Recovered partial JSON: content_analysis is complete, response tail is truncated")
+        return partial
+
     logger.debug("Failed to extract JSON from: %.200s...", text)
     return None
+
+
+def _extract_partial_content_analysis(text: str) -> dict | None:
+    """Восстанавливает ответ, если оборван хвост после content_analysis.
+
+    Это узкий fallback для Kaggle smoke-run: оценки уже сгенерированы, но
+    top-level JSON не закрылся на evidence/unknown_topics из-за лимита длины.
+    """
+    match = re.search(r'"content_analysis"\s*:\s*', text)
+    if match is None:
+        return None
+
+    start = text.find("{", match.end())
+    if start < 0:
+        return None
+
+    end = _json_object_end(text[start:])
+    if end is None:
+        return None
+
+    try:
+        content_analysis = json.loads(text[start : start + end])
+    except json.JSONDecodeError:
+        return None
+
+    return {
+        "content_analysis": content_analysis,
+        "evidence": {},
+        "contradictions": [],
+        "unknown_topics": ["model_response_truncated_after_content_analysis"],
+        "overall_confidence": _derive_partial_overall_confidence(content_analysis),
+        "insufficient_data": False,
+        "partial_response": True,
+    }
+
+
+def _derive_partial_overall_confidence(content_analysis: dict) -> float:
+    """Оценивает confidence для partial-ответа по доступным confidence полям."""
+    values: list[float] = []
+    axes = content_analysis.get("axes", {})
+    for axis in axes.values():
+        confidence = axis.get("confidence") if isinstance(axis, dict) else None
+        if isinstance(confidence, int | float):
+            values.append(float(confidence))
+
+    protest = content_analysis.get("protest_rhetoric", {})
+    confidence = protest.get("confidence") if isinstance(protest, dict) else None
+    if isinstance(confidence, int | float):
+        values.append(float(confidence))
+
+    if not values:
+        return 0.0
+    return round(sum(values) / len(values), 2)
 
 
 def _find_first_valid_json_object(text: str) -> dict | None:
@@ -440,6 +498,9 @@ def merge_block_results(block_results: list[dict]) -> dict:
     # insufficient_data: True if ANY block has insufficient data
     merged["insufficient_data"] = any(
         r.get("insufficient_data", False) for r in block_results
+    )
+    merged["partial_response"] = any(
+        r.get("partial_response", False) for r in block_results
     )
 
     return merged

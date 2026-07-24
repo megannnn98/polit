@@ -129,6 +129,7 @@ class AnalysisResponse(BaseModel):
     unknown_topics: list[str] = Field(default_factory=list)
     overall_confidence: float | None = Field(None, ge=0.0, le=1.0)
     insufficient_data: bool = False
+    partial_response: bool = False
 
 
 def validate_analysis_response(
