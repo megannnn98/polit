@@ -122,17 +122,20 @@ class Pipeline:
         self.state.total_users = len(user_comments)
         logger.info("Found %d users with sufficient comments", self.state.total_users)
 
-        # Step 4: Load model
-        logger.info("Step 4: Loading model...")
-        from .model_loader import load_model, ModelConfig
-        model_config = ModelConfig(
-            model_id=self.config.model_id,
-            max_new_tokens=self.config.max_new_tokens,
-            temperature=0.0,
-            do_sample=False,
-            seed=self.config.seed,
-        )
-        self.model, self.tokenizer = load_model(model_config)
+        # Step 4: Load model (skip if caller already preloaded it)
+        if self.model is not None and self.tokenizer is not None:
+            logger.info("Step 4: Using preloaded model")
+        else:
+            logger.info("Step 4: Loading model...")
+            from .model_loader import load_model, ModelConfig
+            model_config = ModelConfig(
+                model_id=self.config.model_id,
+                max_new_tokens=self.config.max_new_tokens,
+                temperature=0.0,
+                do_sample=False,
+                seed=self.config.seed,
+            )
+            self.model, self.tokenizer = load_model(model_config)
 
         # Step 5: Start run
         self.run_id = self.storage.start_run(self.config.to_dict())
