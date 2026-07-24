@@ -38,6 +38,7 @@ class PipelineConfig:
     resume: bool = True
     force_reprocess: bool = False
     output_dir: str = "."
+    device: str = "auto"
     max_retries: int = 1
     max_comments_per_block: int = 50
     max_chars_per_block: int = 16000
@@ -58,6 +59,7 @@ class PipelineConfig:
             "resume": self.resume,
             "force_reprocess": self.force_reprocess,
             "output_dir": self.output_dir,
+            "device": self.device,
             "max_retries": self.max_retries,
             "max_comments_per_block": self.max_comments_per_block,
             "max_chars_per_block": self.max_chars_per_block,
@@ -136,6 +138,7 @@ class Pipeline:
                 temperature=0.0,
                 do_sample=False,
                 seed=self.config.seed,
+                device=self.config.device,
             )
             self.model, self.tokenizer = load_model(model_config)
 
@@ -410,6 +413,10 @@ def main(argv: list[str] | None = None) -> None:
         help="Output directory (default: current dir)"
     )
     parser.add_argument(
+        "--cpu", action="store_true",
+        help="Force CPU mode (float32, no quantization)"
+    )
+    parser.add_argument(
         "--no-resume", action="store_true",
         help="Disable resume (reprocess all users)"
     )
@@ -439,6 +446,7 @@ def main(argv: list[str] | None = None) -> None:
         max_new_tokens=args.max_new_tokens,
         seed=args.seed,
         output_dir=args.output_dir,
+        device="cpu" if args.cpu else "auto",
         resume=not args.no_resume,
         force_reprocess=args.force_reprocess,
     )
